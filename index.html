@@ -1,0 +1,1395 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta id="versaoDeck" content="1">
+<title>Códice · Display como serviço para a indústria</title>
+<meta name="description" content="Display inteligente no ponto extra, fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A marca assina por módulo, por mês.">
+<meta property="og:title" content="Códice · Display como serviço para a indústria">
+<meta property="og:description" content="Sua marca no ponto extra. Sem comprar o móvel.">
+<meta property="og:image" content="https://projetos.75lab.com.br/codice-industria/assets/og.jpg">
+<link rel="icon" href="assets/codice-simbolo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="module" src="assets/vendor/model-viewer.min.js"></script>
+<script src="assets/vendor/qrcode.min.js"></script>
+<script>
+// ?pdf=1: modo de impressão (todas as telas empilhadas, sem cadastro). Quem já se identificou não vê o cadastro de novo.
+(function(){var h=document.documentElement,pdf=/[?&]pdf=1/.test(location.search);
+  if(pdf){h.classList.add("pdf");return}
+  var ok=false;try{ok=!!localStorage.getItem("codice_acesso_v1")}catch(e){}
+  if(!ok)h.classList.add("gated")})();
+</script>
+<style>
+/* ==========================================================================
+   CÓDICE PARA A INDÚSTRIA
+   Display como serviço: a marca assina o display, a Códice fabrica (NEOBAND),
+   instala, mantém, troca a comunicação e mede. Palco fixo 1600 x 900.
+   Identidade Códice: Midnight Navy #061B49, Electric Teal #1DD4C8,
+   Intelligent Blue #2F73FF, Graphite #4E4E50, Off-white #F5F7FA. Exo 2 + Inter.
+   ========================================================================== */
+:root{
+  --navy:#061B49;--navy2:#0B2763;--ink:#030E28;--teal:#1DD4C8;--teal-ink:#0B978E;--blue:#2F73FF;
+  --graphite:#4E4E50;--off:#F5F7FA;--red:#E0533D;
+  --ease:cubic-bezier(.16,.84,.28,1);--ease-out:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--ink)}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;color:#fff;-webkit-font-smoothing:antialiased;cursor:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:none;text-align:left}
+a{color:inherit;text-decoration:none;cursor:none}
+img{display:block;max-width:none}
+::selection{background:var(--teal);color:var(--navy)}
+:focus-visible{outline:2px solid var(--teal);outline-offset:3px;border-radius:8px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* ---------- Cursor em dois tons: aparece sobre navy, branco e teal ---------- */
+#cur,#curDot{position:fixed;top:0;left:0;pointer-events:none;z-index:9999;will-change:transform}
+#cur{width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;border:2.5px solid #061B49;box-shadow:0 0 0 1.5px rgba(255,255,255,.9),inset 0 0 0 1.5px rgba(255,255,255,.9);
+  transition:width .3s var(--ease),height .3s var(--ease),margin .3s var(--ease),opacity .25s,border-color .25s}
+#curDot{width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:#061B49;box-shadow:0 0 0 2.5px #fff}
+body.hot #cur{width:60px;height:60px;margin:-30px 0 0 -30px;border-color:var(--blue)}
+body.hidecur #cur,body.hidecur #curDot{opacity:0}
+@media (hover:none){body,button,a{cursor:auto}#cur,#curDot{display:none}}
+
+/* ---------- Palco fixo 1600 x 900, centralizado por margem negativa ---------- */
+#deck{position:fixed;inset:0;overflow:hidden;background:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1600px;height:900px;margin:-450px 0 0 -800px;transform-origin:center center;overflow:hidden;background:var(--navy)}
+.slide{position:absolute;inset:0;display:none;overflow:hidden;background:var(--navy);color:#fff;
+  --fg:#fff;--fg2:rgba(255,255,255,.74);--fg3:rgba(255,255,255,.5);--ln:rgba(255,255,255,.14);--card:rgba(255,255,255,.06);--em:var(--teal)}
+.slide.lt{background:#fff;color:var(--navy);--fg:#061B49;--fg2:#56607A;--fg3:#8C95A8;--ln:rgba(6,27,73,.11);--card:#F5F7FA;--em:var(--blue)}
+.slide.off{background:var(--off)}
+.slide.on{display:block}
+/* miolo a 88%: o conteúdo respira, o fundo ocupa a tela */
+.m{position:absolute;left:6%;right:6%;top:12%;bottom:10.5%;display:flex;flex-direction:column}
+
+/* ---------- Topo e rodapé presos ao palco ---------- */
+#top,#bot{position:absolute;left:6%;right:6%;z-index:40;display:flex;align-items:center;gap:14px;transition:color .4s}
+#top{top:30px;height:40px}
+#bot{bottom:26px;height:34px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{height:24px;width:auto}
+.brand .l75{height:18px}
+.brand .x{font-size:14px;opacity:.5}
+.lt-only{display:none}
+#stage.tone-lt .lt-only{display:block}#stage.tone-lt .dk-only{display:none}
+#chap{font-family:'Exo 2';font-size:12.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.62);margin-left:18px;padding-left:18px;border-left:1px solid rgba(255,255,255,.2)}
+#stage.tone-lt #chap{color:#56607A;border-color:rgba(6,27,73,.16)}
+.sp{flex:1}
+.chip{height:36px;padding:0 16px;border-radius:100px;border:1.5px solid rgba(255,255,255,.28);display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;transition:background .25s,border-color .25s}
+.chip:hover{background:rgba(255,255,255,.1)}
+#stage.tone-lt .chip{border-color:rgba(6,27,73,.18);color:var(--navy)}
+#stage.tone-lt .chip:hover{background:rgba(6,27,73,.05)}
+.chip svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#prog{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.14);overflow:hidden}
+#prog i{display:block;height:100%;width:0;background:var(--teal);transition:width .6s var(--ease)}
+#stage.tone-lt #prog{background:rgba(6,27,73,.1)}#stage.tone-lt #prog i{background:var(--blue)}
+#count{font-family:'Exo 2';font-weight:700;font-size:13px;letter-spacing:.08em;min-width:66px;text-align:center;font-variant-numeric:tabular-nums}
+.nb{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.28);display:grid;place-items:center;transition:background .25s}
+.nb:hover{background:rgba(255,255,255,.1)}
+#stage.tone-lt .nb{border-color:rgba(6,27,73,.18)}
+.nb svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#stage.tone-lt #top,#stage.tone-lt #bot{color:var(--navy)}
+#stage.bot-dk #bot{color:#fff}#stage.bot-dk #prog{background:rgba(255,255,255,.14)}#stage.bot-dk #prog i{background:var(--teal)}#stage.bot-dk .nb{border-color:rgba(255,255,255,.28)}
+#chap:empty{display:none}
+
+/* ---------- Cortina de troca de tela, com o símbolo ---------- */
+#cv{position:absolute;inset:0;z-index:60;background:var(--navy);display:grid;place-items:center;transform:translateX(-101%);pointer-events:none}
+#cv img{height:110px;width:auto;opacity:0}
+#cv.go{animation:cvIn .34s var(--ease) forwards}
+#cv.go img{animation:cvLogo .5s .12s both}
+#cv.out{animation:cvOut .42s var(--ease) forwards}
+@keyframes cvIn{from{transform:translateX(-101%)}to{transform:translateX(0)}}
+@keyframes cvOut{from{transform:translateX(0)}to{transform:translateX(101%)}}
+@keyframes cvLogo{0%{opacity:0;transform:scale(.8)}50%{opacity:1;transform:scale(1)}100%{opacity:0}}
+
+/* ---------- Tipografia ---------- */
+.ey{display:flex;align-items:center;gap:10px;font-family:'Exo 2';font-size:14px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--em)}
+.ey::before{content:"";width:22px;height:3px;border-radius:2px;background:currentColor}
+h1,h2,h3{font-family:'Exo 2';font-weight:800;letter-spacing:-.015em;line-height:1.02}
+h2{font-size:58px;margin-top:16px;text-wrap:balance}
+h1{text-wrap:balance}
+h2 em,h1 em{font-style:normal;color:var(--em)}
+.lede{font-size:20px;line-height:1.5;color:var(--fg2)}
+.src{position:absolute;left:0;right:0;bottom:-34px;font-size:11.5px;line-height:1.4;color:var(--fg3)}
+.num{font-family:'Exo 2';font-weight:800;font-variant-numeric:tabular-nums}
+.btn{height:54px;padding:0 26px;border-radius:100px;display:inline-flex;align-items:center;gap:10px;font-family:'Exo 2';font-weight:700;font-size:16px;letter-spacing:.01em;transition:transform .25s var(--ease),background .25s}
+.btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn.pri{background:var(--teal);color:var(--navy)}
+.btn.pri:hover{transform:translateY(-2px)}
+.btn.nav{background:var(--navy);color:#fff}
+.btn.gho{border:1.5px solid var(--ln);color:var(--fg)}
+.btn.gho:hover{background:var(--card)}
+.clk{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--fg2)}
+.clk svg{width:18px;height:18px;stroke:var(--em);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;animation:tap 1.8s ease-in-out infinite}
+@keyframes tap{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.ico{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- Entradas ---------- */
+.slide.on [data-a]{animation:aUp .8s var(--ease-out) both;animation-delay:calc(var(--d,0)*80ms + 160ms)}
+.slide.on [data-a="fade"]{animation-name:aFade}
+.slide.on [data-a="left"]{animation-name:aLeft}
+.slide.on [data-a="right"]{animation-name:aRight}
+.slide.on [data-a="pop"]{animation-name:aPop}
+@keyframes aUp{from{opacity:0;transform:translateY(26px)}}
+@keyframes aFade{from{opacity:0}}
+@keyframes aLeft{from{opacity:0;transform:translateX(-36px)}}
+@keyframes aRight{from{opacity:0;transform:translateX(36px)}}
+@keyframes aPop{from{opacity:0;transform:scale(.9)}}
+
+/* ---------- Roteiro: itens clicáveis que abrem sozinhos, com barrinha ---------- */
+[data-rt-i]{position:relative}
+[data-rt-i]::after{content:"";position:absolute;left:14px;right:14px;bottom:5px;height:2.5px;border-radius:2px;background:currentColor;opacity:.55;transform:scaleX(0);transform-origin:left}
+[data-rt-i].rt-run::after{animation:rtFill var(--rt,5s) linear forwards}
+@keyframes rtFill{to{transform:scaleX(1)}}
+
+/* ==================== 01 · CAPA ==================== */
+.s1{background:radial-gradient(70% 90% at 76% 46%,#123A8C 0%,#061B49 46%,#030E28 100%)}
+.s1 .face{position:absolute;right:-180px;top:-200px;width:640px;opacity:.07}
+.s1 h1{font-size:84px;line-height:1;margin-top:22px;max-width:760px}
+.s1 .lede{max-width:600px;margin-top:28px}
+.s1 .acts{display:flex;gap:12px;margin-top:40px}
+.s1 .hero{position:absolute;right:4%;top:12%;height:78%;width:42%}
+.s1 .hero img{position:absolute;left:50%;bottom:7%;height:92%;width:auto;transform:translateX(-50%);filter:drop-shadow(0 40px 50px rgba(0,0,0,.55))}
+.s1 .floor{position:absolute;left:12%;right:12%;bottom:5%;height:40px;border-radius:50%;background:radial-gradient(closest-side,rgba(29,212,200,.28),transparent)}
+.s1 .tag{position:absolute;right:2%;top:10%;width:200px;background:#fff;color:var(--navy);border-radius:14px;overflow:hidden;box-shadow:0 24px 50px rgba(0,0,0,.4);transform:rotate(4deg)}
+.s1 .tag .h{background:var(--teal);font-family:'Exo 2';font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;padding:8px 14px}
+.s1 .tag .b{padding:12px 14px 14px}
+.s1 .tag small{display:block;font-size:12px;color:#56607A}
+.s1 .tag b{display:block;font-family:'Exo 2';font-size:44px;font-weight:800;line-height:1.05}
+.s1 .logos{position:absolute;left:0;bottom:0;display:flex;align-items:center;gap:30px}
+.s1 .logos div{display:flex;flex-direction:column;gap:8px}
+.s1 .logos small{font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.s1 .logos i{width:1px;height:44px;background:rgba(255,255,255,.18)}
+
+/* ==================== 02 · RESUMO ==================== */
+.s2 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:44px}
+.s2 .bk{background:#fff;border:1px solid var(--ln);border-radius:20px;padding:28px 26px 26px;display:flex;flex-direction:column;gap:12px;min-height:340px}
+.s2 .bk h3{font-size:24px}
+.s2 .bk p{font-size:16.5px}
+.s2 .bk .n{font-family:'Exo 2';font-size:13px;font-weight:800;letter-spacing:.16em;color:var(--blue)}
+.s2 .bk h3{font-size:22px;letter-spacing:0}
+.s2 .bk .big{font-family:'Exo 2';font-weight:800;font-size:46px;white-space:nowrap;line-height:1;color:var(--navy);margin-top:auto}
+.s2 .bk p{font-size:15.5px;line-height:1.5;color:var(--fg2)}
+.s2 .bk.hi{background:var(--navy);color:#fff;border-color:var(--navy)}
+.s2 .bk.hi .big{color:var(--teal)}.s2 .bk.hi p{color:rgba(255,255,255,.74)}.s2 .bk.hi .n{color:var(--teal)}
+.s2 .trail{margin-top:auto;display:flex;align-items:center;gap:0}
+.s2 .trail button{flex:1;display:flex;align-items:center;gap:12px;padding:14px 18px;border-radius:14px;transition:background .25s}
+.s2 .trail button:hover{background:#fff}
+.s2 .trail b{width:34px;height:34px;flex:0 0 34px;border-radius:50%;display:grid;place-items:center;background:var(--navy);color:#fff;font-family:'Exo 2';font-size:13px}
+.s2 .trail span{font-family:'Exo 2';font-weight:700;font-size:16px}
+.s2 .trail i{width:28px;height:2px;background:var(--ln);flex:0 0 28px}
+
+/* ==================== 03 · 76% ==================== */
+.s3{background:radial-gradient(60% 80% at 28% 50%,#0D2E72 0%,#061B49 55%,#030E28 100%)}
+.s3 .wrap{display:grid;grid-template-columns:720px 1fr;gap:70px;align-items:center;height:100%}
+.s3 .big{position:relative;display:grid;place-items:center;height:620px}
+.s3 .rip{position:absolute;left:50%;top:50%;border-radius:50%;border:1.5px solid rgba(29,212,200,.35);transform:translate(-50%,-50%);animation:rip 4.8s ease-out infinite}
+@keyframes rip{0%{width:200px;height:200px;opacity:.9}100%{width:700px;height:700px;opacity:0}}
+.s3 .pct{position:relative;font-family:'Exo 2';font-weight:800;font-size:330px;line-height:.8;letter-spacing:-.04em;color:var(--teal)}
+.s3 .pct small{font-size:150px}
+.s3 h2{font-size:62px}
+.s3 .ticks{display:grid;grid-template-columns:repeat(50,1fr);gap:4px;margin-top:40px}
+.s3 .ticks i{height:26px;border-radius:2px;background:rgba(255,255,255,.14);transition:background .3s}
+.s3 .ticks i.on{background:var(--teal)}
+.s3 .tl{display:flex;justify-content:space-between;margin-top:12px;font-size:14px;color:var(--fg2)}
+
+/* ==================== 04 · 29% ==================== */
+.s4 .wrap{display:grid;grid-template-columns:400px 1fr;gap:90px;margin-top:30px;flex:1;min-height:0}
+.s4 .waf{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;align-content:start}
+.s4 .waf i{aspect-ratio:.8;border-radius:5px 5px 3px 3px;background:var(--navy);position:relative;transition:background .4s,box-shadow .4s}
+.s4 .waf i::after{content:"";position:absolute;left:18%;right:18%;top:22%;height:2px;background:rgba(255,255,255,.4);box-shadow:0 8px 0 rgba(255,255,255,.4),0 16px 0 rgba(255,255,255,.4)}
+.s4 .waf i.x{background:transparent;box-shadow:inset 0 0 0 2px #E0533D}
+.s4 .waf i.x::after{background:rgba(224,83,61,.5);box-shadow:none;top:48%;transform:rotate(-40deg);left:8%;right:8%}
+.s4 .leg{display:flex;gap:26px;margin-top:22px;font-size:15px;font-weight:600}
+.s4 .leg span{display:flex;align-items:center;gap:9px}
+.s4 .leg i{width:14px;height:20px;border-radius:3px;background:var(--navy)}
+.s4 .leg i.x{background:transparent;box-shadow:inset 0 0 0 2px #E0533D}
+.s4 .stats{display:flex;flex-direction:column;gap:0}
+.s4 .st{display:grid;grid-template-columns:200px 1fr;gap:26px;align-items:center;padding:20px 0;border-bottom:1px solid var(--ln)}
+.s4 .st:first-child{padding-top:0}
+.s4 .st b{font-family:'Exo 2';font-size:76px;font-weight:800;line-height:1;color:var(--navy)}
+.s4 .st b.r{color:#D0432E}
+.s4 .st p{font-size:18px;line-height:1.45;color:var(--fg2)}
+.s4 .st p strong{color:var(--navy)}
+.s4 .note{margin-top:26px;display:flex;gap:16px;align-items:center;padding:18px 22px;border-radius:16px;background:var(--navy);color:#fff;font-size:17px;line-height:1.45}
+.s4 .note .ico{flex:0 0 30px;width:30px;height:30px;stroke:var(--teal)}
+
+/* ==================== 05 · ICEBERG ==================== */
+.s5{background:linear-gradient(180deg,#F5F7FA 0%,#F5F7FA 37%,#0B2763 37.2%,#061B49 70%,#030E28 100%)}
+.s5 .wave{position:absolute;left:0;right:0;top:calc(37% - 18px);height:36px;width:200%;animation:wave 14s linear infinite}
+@keyframes wave{to{transform:translateX(-50%)}}
+.s5 .hd{color:var(--navy);--em:var(--blue);--fg2:#56607A}
+.s5 .berg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.s5 .tip{position:absolute;left:428px;top:150px;color:var(--navy)}
+.s5 .tip small{display:block;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#56607A}
+.s5 .tip b{font-family:'Exo 2';font-size:40px;font-weight:800}
+.s5 .hid{position:absolute;left:40px;top:43%;width:540px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.s5 .hid button{padding:16px 18px 18px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#fff;transition:background .3s,border-color .3s,transform .3s}
+.s5 .hid button b{display:block;font-family:'Exo 2';font-size:19px;font-weight:700}
+.s5 .hid button small{display:block;margin-top:3px;font-size:13.5px;color:rgba(255,255,255,.62)}
+.s5 .hid button.on{background:#fff;color:var(--navy);border-color:#fff;transform:translateX(6px)}
+.s5 .hid button.on small{color:#56607A}
+.s5 .det{position:absolute;right:0;top:43%;width:560px;color:#fff}
+.s5 .det .k{font-family:'Exo 2';font-size:14px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+.s5 .det h3{font-size:48px;margin-top:12px}
+.s5 .det .v{font-family:'Exo 2';font-size:30px;font-weight:700;color:var(--teal);margin-top:10px}
+.s5 .det p{font-size:19px;line-height:1.5;color:rgba(255,255,255,.78);margin-top:14px;max-width:500px}
+.s5 .det .swap{animation:aFade .45s both}
+.s5 .src{color:rgba(255,255,255,.5)}
+.s5 .clk{color:rgba(255,255,255,.7)}.s5 .clk svg{stroke:var(--teal)}
+
+/* ==================== 06 · GRUPO ==================== */
+.s6{background:#030E28}
+.s6 .ph{position:absolute;right:0;top:0;bottom:0;width:42%;overflow:hidden}
+.s6 .ph img{width:100%;height:100%;object-fit:cover;object-position:40% 80%;opacity:.5}
+.s6 .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#030E28 0%,rgba(3,14,40,0) 38%),linear-gradient(90deg,#030E28 0%,rgba(3,14,40,.45) 40%,rgba(3,14,40,.2) 100%)}
+.s6 .stack{margin-top:34px;display:flex;flex-direction:column-reverse;gap:10px;width:960px}
+.s6 .ly{display:grid;grid-template-columns:150px 230px 1fr;align-items:center;gap:22px;padding:20px 26px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.s6 .ly .k{font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--teal)}
+.s6 .ly .k span{display:block;font-family:'Exo 2';font-size:17px;letter-spacing:0;text-transform:none;color:#fff;margin-top:4px}
+.s6 .ly .lg img{height:34px;width:auto}
+.s6 .ly .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.s6 .ly .nums b{display:block;font-family:'Exo 2';font-size:30px;font-weight:800;line-height:1}
+.s6 .ly .nums small{display:block;font-size:12.5px;color:rgba(255,255,255,.6);margin-top:5px;line-height:1.3}
+.s6 .ly.cx{background:#fff;color:var(--navy);border-color:#fff}
+.s6 .ly.cx .k{color:var(--teal-ink)}.s6 .ly.cx .k span{color:var(--navy)}
+.s6 .ly.cx p{font-size:17px;line-height:1.45;color:#3A4560}
+.s6 .ly .whose{grid-column:3;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.42);margin-top:-12px}
+
+/* ==================== 07 · A VIRADA ==================== */
+.s7 .wrap{display:grid;grid-template-columns:1fr 470px;gap:70px;margin-top:38px;flex:1;min-height:0;align-items:center}
+.s7 .inc{display:grid;grid-template-columns:1fr 1fr;gap:12px 28px;align-content:start}
+.s7 .inc div{display:flex;gap:14px;align-items:center;padding:20px 0;border-bottom:1px solid var(--ln);font-size:20px;font-weight:500}
+.s7 .inc .ck{flex:0 0 34px;width:34px;height:34px;border-radius:50%;background:rgba(29,212,200,.16);display:grid;place-items:center}
+.s7 .inc .ck svg{width:18px;height:18px;stroke:var(--teal-ink);fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.s7 .pills{display:flex;gap:10px;margin-top:30px;flex-wrap:wrap}
+.s7 .pills span{padding:10px 16px;border-radius:100px;background:var(--off);font-size:14.5px;font-weight:600;color:var(--navy)}
+.s7 .tag{align-self:center;border-radius:24px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(6,27,73,.18),0 0 0 1px rgba(6,27,73,.08);transform:rotate(-2deg)}
+.s7 .tag .h{display:flex;align-items:center;justify-content:space-between;background:var(--navy);color:#fff;padding:16px 26px}
+.s7 .tag .h span{font-family:'Exo 2';font-size:14px;font-weight:800;letter-spacing:.18em;text-transform:uppercase}
+.s7 .tag .h img{height:30px;width:auto}
+.s7 .tag .b{padding:24px 28px 26px}
+.s7 .tag .b small{font-size:15px;color:#56607A}
+.s7 .tag .pr{display:flex;align-items:flex-start;gap:6px;font-family:'Exo 2';font-weight:800;color:var(--navy);line-height:.9;margin:8px 0 6px}
+.s7 .tag .pr>span{font-size:42px;margin-top:14px}
+.s7 .tag .pr b{font-size:150px;letter-spacing:-.03em}
+.s7 .tag .bar{display:flex;gap:3px;height:42px;margin-top:18px;align-items:flex-end}
+.s7 .tag .bar i{flex:1;background:var(--navy);border-radius:1px}
+.s7 .tag .ft{margin-top:14px;font-size:13px;line-height:1.45;color:#56607A}
+
+/* ==================== 08 · COMO FUNCIONA ==================== */
+.s8 .flow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:22px;margin-top:40px;flex:1;min-height:0}
+.s8 .line{position:absolute;left:4%;right:4%;top:269px;height:2px;background:var(--ln)}
+.s8 .line i{position:absolute;top:-5px;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 5px rgba(47,115,255,.18);animation:trav 6s var(--ease) infinite}
+@keyframes trav{0%{left:0}100%{left:100%}}
+.s8 .st{display:flex;flex-direction:column}
+.s8 .st .img{height:270px;border-radius:18px;overflow:hidden;background:var(--off)}
+.s8 .st .img img{width:100%;height:100%;object-fit:cover}
+.s8 .st .dot{position:relative;z-index:1;width:54px;height:54px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-family:'Exo 2';font-weight:800;font-size:18px;margin:-0px 0 0 22px;transform:translateY(0);border:5px solid #F5F7FA}
+.s8 .st .who{margin-top:14px;align-self:flex-start;padding:5px 12px;border-radius:100px;font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.s8 .st .who.v{background:rgba(47,115,255,.12);color:var(--blue)}
+.s8 .st .who.c{background:rgba(29,212,200,.18);color:var(--teal-ink)}
+.s8 .st h3{font-size:27px;margin-top:12px;letter-spacing:0}
+.s8 .st p{font-size:17px;line-height:1.5;color:var(--fg2);margin-top:8px}
+
+/* ==================== 09 · MARCAS ==================== */
+.s9 .wall{position:absolute;left:-3%;right:-3%;bottom:16px;height:470px;display:flex;align-items:flex-end;justify-content:center;gap:2px}
+.s9 .wall::after{content:"";position:absolute;left:-4%;right:-4%;bottom:62px;height:2px;background:var(--ln)}
+.s9 .br{position:relative;display:flex;flex-direction:column;align-items:center;transition:transform .45s var(--ease)}
+.s9 .br img{height:var(--h,380px);width:auto;transition:filter .45s,transform .45s var(--ease);filter:drop-shadow(0 18px 18px rgba(6,27,73,.18))}
+.s9 .br .cap{height:62px;padding-top:12px;text-align:center}
+.s9 .br .cap b{display:block;font-family:'Exo 2';font-size:16px;font-weight:700;white-space:nowrap}
+.s9 .br .cap small{display:block;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3)}
+.s9 .br.on img,.s9 .br:hover img{transform:translateY(-14px) scale(1.04)}
+.s9 .br.on .cap b{color:var(--blue)}
+.s9 .br::after{left:20%;right:20%}
+.s9 .top{display:flex;flex-direction:column;gap:6px}
+
+/* ==================== 10 · FORMATOS ==================== */
+.s10 .wrap{display:grid;grid-template-columns:430px 1fr 300px;gap:30px;margin-top:30px;flex:1;min-height:0}
+.s10 .lst{display:flex;flex-direction:column;gap:6px}
+.s10 .lst button{display:grid;grid-template-columns:1fr 92px;align-items:center;gap:6px 12px;padding:12px 16px 14px;border-radius:14px;transition:background .25s}
+.s10 .lst button:hover{background:var(--off)}
+.s10 .lst button b{font-family:'Exo 2';font-size:18px;font-weight:700}
+.s10 .lst button .p{font-family:'Exo 2';font-size:16px;font-weight:700;text-align:right}
+.s10 .lst button .bar{grid-column:1/3;height:6px;border-radius:3px;background:var(--off);overflow:hidden}
+.s10 .lst button .bar i{display:block;height:100%;width:var(--w);background:rgba(6,27,73,.25);border-radius:3px;transition:background .3s}
+.s10 .lst button.on{background:var(--navy);color:#fff}
+.s10 .lst button::after{bottom:3px}
+.s10 .lst button.on .bar{background:rgba(255,255,255,.14)}.s10 .lst button.on .bar i{background:var(--teal)}
+.s10 .mvw{position:relative;border-radius:24px;background:radial-gradient(70% 60% at 50% 55%,#fff 0%,#EEF1F6 100%);overflow:hidden}
+.s10 model-viewer{width:100%;height:100%;--poster-color:transparent;background:transparent}
+.s10 .mvw .hint{position:absolute;left:18px;bottom:16px}
+.s10 .info{display:flex;flex-direction:column;gap:16px}
+.s10 .info .t{font-family:'Exo 2';font-size:30px;font-weight:800;line-height:1.05}
+.s10 .info p{font-size:15.5px;line-height:1.5;color:var(--fg2)}
+.s10 .row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--ln);font-size:14.5px}
+.s10 .row span{color:var(--fg2)}.s10 .row b{text-align:right}
+.s10 .qr{display:flex;gap:14px;align-items:center;margin-top:auto;padding:14px;border-radius:16px;background:var(--off)}
+.s10 .qr .q{width:92px;height:92px;flex:0 0 92px;background:#fff;padding:7px;border-radius:10px}
+.s10 .qr .q svg{width:100%;height:100%}
+.s10 .qr small{font-size:13px;line-height:1.45;color:var(--fg2)}
+.s10 .qr b{display:block;font-family:'Exo 2';font-size:16px;color:var(--navy);margin-bottom:3px}
+.s10 .swap{animation:aFade .4s both}
+
+/* ==================== 11 · PROVA ==================== */
+.s11{background:radial-gradient(60% 70% at 80% 60%,#0D2E72 0%,#061B49 50%,#030E28 100%)}
+.s11 .wrap{display:grid;grid-template-columns:400px 1fr;gap:56px;margin-top:34px;flex:1;min-height:0}
+.s11 .phone{background:#fff;color:var(--navy);border-radius:34px;padding:16px;box-shadow:0 30px 70px rgba(0,0,0,.45),0 0 0 8px #0E1E44;align-self:start}
+.s11 .phone .ok{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:16px;background:rgba(29,212,200,.16);font-family:'Exo 2';font-weight:800;font-size:17px;color:var(--teal-ink)}
+.s11 .phone .ok svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.s11 .phone .fach{height:150px;border-radius:14px;overflow:hidden;margin-top:12px;position:relative}
+.s11 .phone .fach img{width:100%;height:100%;object-fit:cover}
+.s11 .phone .fach span{position:absolute;left:10px;bottom:10px;padding:4px 10px;border-radius:100px;background:rgba(3,14,40,.72);color:#fff;font-size:11.5px;font-weight:600}
+.s11 .phone .r{display:flex;justify-content:space-between;gap:12px;padding:10px 4px;border-bottom:1px solid rgba(6,27,73,.08);font-size:13.5px}
+.s11 .phone .r span{color:#56607A}.s11 .phone .r b{text-align:right}
+.s11 .phone .ex{margin-top:10px;font-size:11.5px;color:#8C95A8;text-align:center}
+.s11 .scr{position:relative;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(0,0,0,.45)}
+.s11 .scr .bar{height:30px;background:#E9EDF4;display:flex;align-items:center;gap:6px;padding:0 12px}
+.s11 .scr .bar i{width:10px;height:10px;border-radius:50%;background:#C9D1DE}
+.s11 .scr{height:400px}
+.s11 .scr img{width:100%;height:calc(100% - 30px);object-fit:cover;object-position:top left}
+.s11 .scr .zoom{position:absolute;right:14px;bottom:14px}
+.s11 .pr{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+.s11 .pr div{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.s11 .pr .ico{flex:0 0 26px;stroke:var(--teal)}
+.s11 .pr b{display:block;font-family:'Exo 2';font-size:17px}
+.s11 .pr small{display:block;font-size:13.5px;line-height:1.4;color:rgba(255,255,255,.65);margin-top:3px}
+.zoom{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:100px;background:rgba(3,14,40,.78);color:#fff;font-size:12.5px;font-weight:600}
+.zoom svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+
+/* ==================== 12 · DADOS ==================== */
+.s12 .wrap{display:grid;grid-template-columns:600px 1fr;gap:60px;margin-top:18px;flex:1;min-height:0}
+.s12 .disp{position:relative;height:100%}
+.s12 .disp img.d{position:absolute;left:50%;bottom:0;height:100%;width:auto;transform:translateX(-50%)}
+.s12 .hs{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:var(--blue);color:#fff;display:grid;place-items:center;font-family:'Exo 2';font-weight:800;font-size:15px;box-shadow:0 0 0 6px rgba(47,115,255,.22);transition:transform .3s,background .3s}
+.s12 .hs::before{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--blue);animation:hsP 2.2s ease-out infinite}
+@keyframes hsP{from{transform:scale(1);opacity:.8}to{transform:scale(1.9);opacity:0}}
+.s12 .hs.on{background:var(--navy);transform:scale(1.15)}
+.s12 .hs.on::before{border-color:var(--navy)}
+.s12 .hs::after{display:none}
+.s12 .pan{display:flex;flex-direction:column;gap:14px;padding-top:10px}
+.s12 .pan .plan{align-self:flex-start;padding:6px 14px;border-radius:100px;background:rgba(47,115,255,.12);color:var(--blue);font-size:12.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.s12 .pan h3{font-size:40px}
+.s12 .pan p{font-size:18px;line-height:1.5;color:var(--fg2)}
+.s12 .pan .dec{display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:14px;background:var(--off);font-size:16px}
+.s12 .pan .dec b{font-family:'Exo 2';color:var(--navy)}
+.s12 .tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.s12 .tabs button{padding:12px 14px 16px;border-radius:12px;border:1.5px solid var(--ln);font-family:'Exo 2';font-weight:700;font-size:14.5px;line-height:1.2;transition:background .25s,color .25s,border-color .25s}
+.s12 .tabs button.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.s12 .low{margin-top:auto;display:grid;grid-template-columns:260px 1fr;gap:20px;align-items:center}
+.s12 .thumb{position:relative;border-radius:12px;overflow:hidden;box-shadow:0 12px 30px rgba(6,27,73,.18)}
+.s12 .thumb img{width:100%;height:auto}
+.s12 .thumb .zoom{position:absolute;right:8px;bottom:8px;padding:6px 10px;font-size:11.5px}
+.s12 .priv{display:flex;gap:12px;align-items:center;font-size:14.5px;line-height:1.45;color:var(--fg2)}
+.s12 .priv .ico{flex:0 0 26px;stroke:var(--navy)}
+.s12 .swap{animation:aFade .4s both}
+
+/* ==================== 13 · COMPRAR x ASSINAR ==================== */
+.s13 .wrap{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:34px;flex:1;min-height:0}
+.s13 .cd{border-radius:22px;padding:28px 30px;display:flex;flex-direction:column}
+.s13 .cd.a{background:#fff;border:1px solid var(--ln)}
+.s13 .cd.b{background:var(--navy);color:#fff}
+.s13 .cd .k{font-family:'Exo 2';font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--blue)}
+.s13 .cd.b .k{color:var(--teal)}
+.s13 .cd h3{font-size:28px;margin-top:8px;letter-spacing:0}
+.s13 .cmp{margin-top:26px;display:flex;flex-direction:column;gap:22px}
+.s13 .cmp .l{display:flex;justify-content:space-between;align-items:baseline;font-size:16px;font-weight:600}
+.s13 .cmp .l b{font-family:'Exo 2';font-size:34px;font-weight:800}
+.s13 .cmp .tr{height:44px;border-radius:10px;background:var(--off);overflow:hidden;display:flex;margin-top:8px}
+.s13 .cmp .tr i{height:100%;width:0;transition:width 1.2s var(--ease)}
+.s13 .cmp small{display:block;font-size:13px;color:var(--fg2);margin-top:6px}
+.s13 .sav{margin-top:auto;display:flex;align-items:center;gap:18px;padding-top:20px;border-top:1px solid var(--ln)}
+.s13 .sav b{font-family:'Exo 2';font-size:64px;font-weight:800;color:var(--teal-ink);line-height:1}
+.s13 .sav p{font-size:16px;line-height:1.45;color:var(--fg2)}
+.s13 .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:end;height:270px;margin-top:24px}
+.s13 .col{display:flex;flex-direction:column;align-items:center;gap:10px;height:100%;justify-content:flex-end}
+.s13 .col .v{font-family:'Exo 2';font-size:26px;font-weight:800}
+.s13 .col .bx{width:100%;border-radius:10px 10px 4px 4px;display:flex;flex-direction:column-reverse;overflow:hidden;height:var(--h)}
+.s13 .col .bx .e{background:var(--teal);flex:1}
+.s13 .col .bx .t{background:rgba(255,255,255,.16);height:var(--t);border-bottom:2px dashed rgba(255,255,255,.4)}
+.s13 .col small{font-size:13px;line-height:1.35;text-align:center;color:rgba(255,255,255,.7)}
+.s13 .col small b{display:block;color:#fff;font-size:14px}
+.s13 .cd.b .ft{margin-top:auto;padding-top:18px;font-size:13px;line-height:1.5;color:rgba(255,255,255,.62)}
+.s13 .lg{display:flex;gap:18px;margin-top:14px;font-size:13px;color:rgba(255,255,255,.75)}
+.s13 .lg span{display:flex;align-items:center;gap:7px}
+.s13 .lg i{width:12px;height:12px;border-radius:3px;background:var(--teal)}
+.s13 .lg i.t{background:rgba(255,255,255,.2);border:1.5px dashed rgba(255,255,255,.5)}
+
+/* ==================== 14 · SIMULADOR ==================== */
+.s14{background:radial-gradient(70% 80% at 80% 30%,#0D2E72 0%,#061B49 50%,#030E28 100%)}
+.s14 .wrap{display:grid;grid-template-columns:520px 1fr;gap:40px;margin-top:30px;flex:1;min-height:0}
+.s14 .ctl{display:flex;flex-direction:column;justify-content:space-between;gap:22px;padding:28px;border-radius:22px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.s14 .ctl label{display:flex;justify-content:space-between;font-size:14px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:10px}
+.s14 .ctl label b{font-family:'Exo 2';font-size:22px;color:#fff}
+.s14 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.16);outline:none;cursor:none}
+.s14 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:var(--teal);border:4px solid var(--navy);box-shadow:0 0 0 2px var(--teal)}
+.s14 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--teal);border:4px solid var(--navy)}
+.s14 .seg{display:flex;gap:8px;flex-wrap:wrap}
+.s14 .seg button{flex:1;padding:11px 10px;border-radius:12px;border:1.5px solid rgba(255,255,255,.2);font-family:'Exo 2';font-weight:700;font-size:14.5px;text-align:center;transition:background .2s,border-color .2s,color .2s;white-space:nowrap}
+.s14 .seg button small{display:block;font-family:Inter;font-weight:500;font-size:11.5px;opacity:.7;margin-top:2px}
+.s14 .seg button.on{background:#fff;color:var(--navy);border-color:#fff}
+.s14 .out{display:flex;flex-direction:column;gap:18px}
+.s14 .hero{padding:32px 34px;border-radius:22px;background:#fff;color:var(--navy)}
+.s14 .hero small{font-size:14px;font-weight:600;color:#56607A}
+.s14 .hero b{display:block;font-family:'Exo 2';font-size:92px;font-weight:800;line-height:1.05}
+.s14 .hero span{font-size:15px;color:#56607A}
+.s14 .kp{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.s14 .kp div{padding:18px 20px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.s14 .kp small{display:block;font-size:13px;color:rgba(255,255,255,.65);line-height:1.35}
+.s14 .kp b{display:block;font-family:'Exo 2';font-size:34px;font-weight:800;margin-top:6px}
+.s14 .kp b.t{color:var(--teal)}
+.s14 .vs{padding:18px 22px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.s14 .vs .r{display:grid;grid-template-columns:150px 1fr 150px;gap:14px;align-items:center;padding:6px 0;font-size:14px}
+.s14 .vs .r .tr{height:16px;border-radius:8px;background:rgba(255,255,255,.08);overflow:hidden}
+.s14 .vs .r .tr i{display:block;height:100%;border-radius:8px;transition:width .6s var(--ease)}
+.s14 .vs .r b{font-family:'Exo 2';font-size:18px;text-align:right}
+.s14 .vs p{font-size:12.5px;color:rgba(255,255,255,.55);margin-top:8px;line-height:1.45}
+
+/* ==================== 15 · PRÓXIMO PASSO ==================== */
+.s15{background:radial-gradient(70% 80% at 20% 30%,#0D2E72 0%,#061B49 50%,#030E28 100%)}
+.s15 h2{font-size:72px;max-width:1100px}
+.s15 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
+.s15 .steps div{padding:24px 26px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.s15 .steps b{font-family:'Exo 2';font-size:14px;font-weight:800;letter-spacing:.16em;color:var(--teal)}
+.s15 .steps h3{font-size:26px;margin-top:10px;letter-spacing:0}
+.s15 .steps p{font-size:15.5px;line-height:1.5;color:rgba(255,255,255,.72);margin-top:8px}
+.s15 .acts{display:flex;gap:12px;margin-top:34px;align-items:center}
+.s15 .inst{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:30px;padding-top:24px;border-top:1px solid rgba(255,255,255,.14)}
+.s15 .inst p{font-size:13px;line-height:1.6;color:rgba(255,255,255,.62)}
+.s15 .inst p b{color:#fff}
+.s15 .inst .lg{display:flex;align-items:center;gap:24px}
+.s15 .inst .lg img{height:30px;width:auto}
+
+/* ---------- Índice ---------- */
+#menu{position:absolute;inset:0;z-index:50;background:rgba(3,14,40,.97);display:none;padding:110px 6% 80px}
+#menu.on{display:block;animation:aFade .25s both}
+#menu .cols{display:grid;grid-template-columns:repeat(5,1fr);gap:26px;margin-top:30px}
+#menu h4{font-family:'Exo 2';font-size:13px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+#menu button{display:flex;gap:12px;width:100%;padding:12px 10px;border-radius:12px;font-size:15.5px;line-height:1.35;transition:background .2s}
+#menu button:hover{background:rgba(255,255,255,.07)}
+#menu button b{font-family:'Exo 2';color:rgba(255,255,255,.45);min-width:24px}
+#menu .x{position:absolute;right:6%;top:30px}
+
+/* ---------- Ampliação de imagem e 3D ---------- */
+#lb{position:fixed;inset:0;z-index:9000;background:rgba(3,14,40,.94);display:none;align-items:center;justify-content:center;padding:70px 60px}
+#lb.on{display:flex;animation:aFade .25s both}
+#lb .in{position:relative;max-width:100%;max-height:100%;display:flex;gap:28px;align-items:center}
+#lb img{max-width:calc(100vw - 120px);max-height:calc(100vh - 140px);border-radius:12px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+#lb model-viewer{width:min(62vw,820px);height:min(78vh,760px);background:radial-gradient(70% 60% at 50% 55%,#fff 0%,#E9EDF4 100%);border-radius:20px}
+#lb .side{width:260px;color:#fff}
+#lb .side h3{font-size:30px}
+#lb .side p{font-size:15px;line-height:1.5;color:rgba(255,255,255,.75);margin-top:10px}
+#lb .side .q{width:150px;height:150px;background:#fff;padding:10px;border-radius:14px;margin-top:20px}
+#lb .side .q svg{width:100%;height:100%}
+#lb .side small{display:block;font-size:13px;color:rgba(255,255,255,.6);margin-top:10px;line-height:1.45}
+#lb .cl{position:fixed;right:28px;top:24px;width:46px;height:46px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center}
+#lb .cl svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+
+/* ---------- Celular em pé ---------- */
+#rotate{position:fixed;inset:0;z-index:8000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--navy);padding:40px;text-align:center}
+#rotate img{height:54px;width:auto}
+#rotate b{font-family:'Exo 2';font-size:22px}
+#rotate span{font-size:14px;color:rgba(255,255,255,.7);max-width:32ch;line-height:1.5}
+@media (max-width:900px) and (orientation:portrait){#rotate{display:flex}}
+
+/* ---------- Cadastro de entrada: a apresentação só abre depois dele ---------- */
+#gate{position:fixed;inset:0;z-index:9500;display:none;align-items:center;justify-content:center;padding:24px 16px;overflow-y:auto;
+  background:rgba(3,14,40,.66);-webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1)}
+html.gated #gate{display:flex}
+#gate.saindo{animation:gtOut .5s var(--ease) forwards}
+@keyframes gtOut{to{opacity:0;visibility:hidden}}
+@keyframes gtIn{from{opacity:0;transform:translateY(18px)}}
+.gt-card{position:relative;width:100%;max-width:468px;margin:auto;background:#fff;color:var(--navy);border-radius:22px;padding:34px 34px 28px;box-shadow:0 30px 80px rgba(3,14,40,.45);animation:gtIn .7s var(--ease-out) both}
+.gt-logo{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+.gt-logo .s{height:40px;width:auto}.gt-logo .w{height:22px;width:auto}
+.gt-logo i{width:1px;height:22px;background:rgba(6,27,73,.16)}
+.gt-logo .l{height:19px;width:auto;opacity:.8}
+.gt-card h1{font-family:'Exo 2';font-weight:700;font-size:28px;line-height:1.12;letter-spacing:-.01em}
+.gt-card .sub{margin-top:8px;font-size:15px;line-height:1.5;color:#58627A}
+.gt-form{margin-top:22px;display:grid;gap:14px}
+.gt-f label{display:block;font-size:12.5px;font-weight:600;letter-spacing:.02em;color:#3A4560;margin-bottom:6px}
+.gt-f input{width:100%;height:48px;border:1.5px solid #D9DEE8;border-radius:12px;padding:0 14px;font:500 16px Inter,system-ui,sans-serif;color:var(--navy);background:#F8F9FC;outline:none;transition:border-color .2s,background .2s,box-shadow .2s;cursor:none}
+.gt-f input::placeholder{color:#A3ABBD;font-weight:400}
+.gt-f input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(47,115,255,.12)}
+.gt-f.err input{border-color:#D93A3A;background:#FFF7F7}
+.gt-f small,.gt-ck small{display:none;margin-top:5px;font-size:12.5px;color:#C62F2F}
+.gt-f.err small,.gt-ck.err small{display:block}
+.gt-isca{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.gt-ck label{display:flex;gap:11px;align-items:flex-start;font-size:14px;line-height:1.45;color:#3A4560;cursor:none}
+.gt-ck input{appearance:none;-webkit-appearance:none;flex:0 0 20px;width:20px;height:20px;margin-top:1px;border:1.5px solid #B9C1D2;border-radius:6px;background:#fff;display:grid;place-items:center;transition:background .2s,border-color .2s;cursor:none}
+.gt-ck input::after{content:"";width:10px;height:6px;border:2.2px solid #fff;border-top:0;border-right:0;transform:translateY(-1px) rotate(-45deg) scale(0);transition:transform .2s var(--ease)}
+.gt-ck input:checked{background:var(--blue);border-color:var(--blue)}
+.gt-ck input:checked::after{transform:translateY(-1px) rotate(-45deg) scale(1)}
+.gt-ck.err input{border-color:#D93A3A}
+.gt-link{color:var(--blue);font-weight:600;text-decoration:underline;text-underline-offset:2px;display:inline;text-align:inherit}
+.gt-btn{margin-top:6px;height:54px;border-radius:14px;background:var(--navy);color:#fff;font:700 16px 'Exo 2',sans-serif;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;gap:10px;text-align:center;transition:background .2s;width:100%}
+.gt-btn:hover{background:#0A2A6E}
+.gt-btn svg{width:18px;height:18px;stroke:var(--teal);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.gt-btn[disabled]{opacity:.7}
+.gt-msg{display:none;font-size:13px;color:#C62F2F;text-align:center}
+.gt-msg.on{display:block}
+.gt-pe{margin-top:16px;display:flex;gap:8px;align-items:center;justify-content:center;font-size:12.5px;color:#8A93A7}
+.gt-pe svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;flex:0 0 14px}
+#gtTermos{display:none}
+.gt-card.termos #gtCad{display:none}
+.gt-card.termos #gtTermos{display:block}
+#gtTermos h1{font-size:24px}
+#gtTermos .ver{margin-top:4px;font-size:12.5px;color:#8A93A7}
+#gtTermos ol{list-style:none;margin-top:18px;display:grid;gap:12px;max-height:min(52vh,420px);overflow-y:auto;padding-right:6px}
+#gtTermos li{font-size:13.5px;line-height:1.5;color:#3A4560}
+#gtTermos li b{display:block;color:var(--navy);font-size:13.5px;margin-bottom:2px}
+.gt-acts{margin-top:20px;display:grid;grid-template-columns:1fr 1.3fr;gap:10px}
+.gt-acts .gt-btn{margin-top:0;height:48px;font-size:15px}
+.gt-sec{background:#EEF1F6;color:var(--navy)}
+.gt-sec:hover{background:#E3E8F0}
+@media (hover:none){.gt-f input,.gt-ck label,.gt-ck input{cursor:auto}}
+@media (max-width:520px){.gt-card{padding:26px 20px 22px;border-radius:18px}.gt-card h1{font-size:24px}.gt-acts{grid-template-columns:1fr}}
+
+/* ---------- PDF: telas empilhadas, conteúdo de clique aberto ---------- */
+.pdf-only{display:none}
+html.pdf,html.pdf body{height:auto;overflow:visible;background:#fff;cursor:auto}
+html.pdf #deck{position:static;overflow:visible}
+html.pdf #stage{position:static;margin:0;transform:none!important;height:auto;overflow:visible;background:none}
+html.pdf .slide{display:block;position:relative;width:1600px;height:900px;page-break-after:always;break-after:page}
+html.pdf .slide [data-a],html.pdf .slide *{animation:none!important}
+html.pdf #top,html.pdf #bot,html.pdf #cv,html.pdf #menu,html.pdf #cur,html.pdf #curDot,html.pdf #gate,html.pdf #rotate,html.pdf #lb,html.pdf .no-pdf,html.pdf .clk{display:none!important}
+html.pdf .pdf-only{display:revert}
+html.pdf .pfoot{display:flex}
+.pfoot{display:none;position:absolute;left:6%;right:6%;top:34px;align-items:center;gap:12px;font-family:'Exo 2';font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}
+.pfoot img{height:20px;width:auto}
+.slide.lt .pfoot{color:#8C95A8}
+@page{size:1600px 900px;margin:0}
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+<symbol id="i-l" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></symbol>
+<symbol id="i-r" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+<symbol id="i-arr" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-hand" viewBox="0 0 24 24"><path d="M9 11V5.5a1.5 1.5 0 013 0V10m0-1.5a1.5 1.5 0 013 0V11m0-1a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-1.2a5 5 0 01-4-2l-3-4a1.5 1.5 0 012.3-1.9L9 14.5"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.2"/><rect x="14" y="3" width="7" height="7" rx="1.2"/><rect x="3" y="14" width="7" height="7" rx="1.2"/><path d="M14 14h3v3h-3zM21 14v3M18 21h3M14 21h1"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z"/><circle cx="12" cy="10" r="2.8"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 105.4 5.4l-8.8 8.8a2.4 2.4 0 01-3.4-3.4z"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 018 0v3"/></symbol>
+<symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.5-4.5M11 8v6M8 11h6"/></symbol>
+<symbol id="i-pdf" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="i-wa" viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4.2A8.5 8.5 0 1112 20.5a8.4 8.4 0 01-4.1-1.1z"/><path d="M9 8.6c.3 2.6 2.4 4.9 5.2 5.6l1-1.2-1.8-1-1 .7c-.9-.4-1.7-1.2-2.1-2.1l.7-1-1-1.8z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></symbol>
+</svg>
+
+<div id="deck">
+<div id="stage">
+
+  <header id="top">
+    <div class="brand">
+      <img class="dk-only" src="assets/codice-logotipo-branco.png" alt="Códice"><img class="lt-only" src="assets/codice-logotipo.png" alt="Códice">
+      <span class="x">×</span>
+      <img class="l75 dk-only" src="assets/75lab-wordmark-paper.png" alt="75 LAB"><img class="l75 lt-only" src="assets/75lab-wordmark-black.png" alt="75 LAB">
+    </div>
+    <span id="chap"></span>
+    <span class="sp"></span>
+    <button class="chip" id="bIdx"><svg><use href="#i-list"/></svg>Índice</button>
+    <a class="chip" href="codice-industria.pdf" download><svg><use href="#i-pdf"/></svg>Baixar PDF</a>
+  </header>
+
+  <!-- ═══ PDF · capa avisando que a apresentação é em HTML ═══ -->
+  <section class="slide s15 pdf-only" data-tone="dk">
+    <div class="m" style="justify-content:center;align-items:center;text-align:center">
+      <img src="assets/codice-simbolo-branco.png" alt="" style="height:96px;width:auto">
+      <h2 style="font-size:60px;margin-top:30px">Esta apresentação foi feita em HTML.</h2>
+      <p class="lede" style="margin-top:16px;max-width:760px">Os displays em 3D, o simulador e as animações estão na versão completa. Aponte a câmera para o código ou clique no botão.</p>
+      <div style="display:flex;gap:40px;align-items:center;margin-top:44px">
+        <div id="pdfQr" style="width:170px;height:170px;background:#fff;padding:12px;border-radius:16px"></div>
+        <a class="btn pri" href="https://projetos.75lab.com.br/codice-industria/">Clique aqui para acessar a apresentação completa<svg><use href="#i-arr"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 01 · CAPA ═══ -->
+  <section class="slide s1" data-tone="dk" data-t="Sua marca no ponto extra, sem comprar o móvel">
+    <img class="face" src="assets/codice-face-topo.png" alt="">
+    <div class="hero">
+      <div class="floor"></div>
+      <img data-a="fade" style="--d:3" src="assets/p/lacta.webp" alt="Ilha Códice com a comunicação da Lacta">
+      <div class="tag" data-a="pop" style="--d:8"><div class="h">Assinatura</div><div class="b"><small>a partir de</small><b>R$ 499</b><small>por módulo, por mês</small></div></div>
+    </div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Códice para a indústria</div>
+      <h1 data-a style="--d:1">Sua marca no ponto extra. <em>Sem comprar o móvel.</em></h1>
+      <p class="lede" data-a style="--d:2">Display inteligente fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A sua marca assina por módulo, por mês.</p>
+      <div class="acts" data-a style="--d:3">
+        <button class="btn pri" data-go="1">Começar<svg><use href="#i-arr"/></svg></button>
+        <button class="btn gho" data-go="13">Simular o meu programa</button>
+        <a class="btn gho" href="codice-industria.pdf" download><svg><use href="#i-pdf"/></svg>PDF</a>
+      </div>
+      <div class="logos" data-a="fade" style="--d:6">
+        <div><small>O serviço</small><img src="assets/codice-logotipo-branco.png" alt="Códice" style="height:30px;width:auto"></div><i></i>
+        <div><small>A fábrica</small><img src="assets/neoband-wordmark-white.png" alt="NEOBAND" style="height:26px;width:auto"></div><i></i>
+        <div><small>Trade e tecnologia</small><img src="assets/75lab-wordmark-paper.png" alt="75 LAB" style="height:28px;width:auto"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 02 · RESUMO EXECUTIVO ═══ -->
+  <section class="slide lt off s2" data-tone="lt" data-t="Resumo executivo">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">Resumo executivo</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Resumo executivo</div>
+      <h2 data-a style="--d:1">Em um minuto: o que a Códice <em>resolve para a sua marca</em>.</h2>
+      <div class="grid">
+        <div class="bk" data-a style="--d:2"><span class="n">01 · O PROBLEMA</span><h3>Display comprado some</h3><p>De cada 100 displays enviados às lojas, 29 nunca chegam ao salão de vendas.</p><span class="big"><span data-cu="29">0</span>%</span></div>
+        <div class="bk" data-a style="--d:3"><span class="n">02 · A SOLUÇÃO</span><h3>Display como serviço</h3><p>A marca assina. A Códice fabrica, instala, mantém e troca a comunicação.</p><span class="big">1 contrato</span></div>
+        <div class="bk" data-a style="--d:4"><span class="n">03 · A PROVA</span><h3>Cada display medido</h3><p>Registro de instalação, localização e fluxo de pessoas no painel da marca.</p><span class="big">QR + sensor</span></div>
+        <div class="bk hi" data-a style="--d:5"><span class="n">04 · O INVESTIMENTO</span><h3>Sem capital parado</h3><p>Por módulo, por mês. Despesa operacional, dedutível no Lucro Real.</p><span class="big">R$ <span data-cu="499">0</span></span></div>
+      </div>
+      <div class="trail" data-a style="--d:7">
+        <button data-go="2"><b>1</b><span>O problema</span></button><i></i>
+        <button data-go="5"><b>2</b><span>A solução</span></button><i></i>
+        <button data-go="10"><b>3</b><span>Prova e dados</span></button><i></i>
+        <button data-go="12"><b>4</b><span>Investimento</span></button><i></i>
+        <button data-go="14"><b>5</b><span>Próximo passo</span></button>
+      </div>
+      <div class="clk" style="margin-top:10px;margin-left:18px;--d:9" data-a="fade"><svg><use href="#i-hand"/></svg>Clique em um capítulo para ir direto</div>
+    </div>
+  </section>
+
+  <!-- ═══ 03 · 76% ═══ -->
+  <section class="slide s3" data-tone="dk" data-t="76% das compras são decididas na loja">
+    <div class="pfoot"><img src="assets/codice-logotipo-branco.png" alt="">O problema</div>
+    <div class="m">
+      <div class="wrap">
+        <div class="big" data-a="pop" style="--d:1">
+          <span class="rip"></span><span class="rip" style="animation-delay:1.6s"></span><span class="rip" style="animation-delay:3.2s"></span>
+          <div class="pct"><span data-cu="76">0</span><small>%</small></div>
+        </div>
+        <div>
+          <div class="ey" data-a style="--d:0">Onde a compra acontece</div>
+          <h2 data-a style="--d:2">A decisão de compra acontece <em>no corredor</em>.</h2>
+          <p class="lede" data-a style="--d:3;margin-top:22px">Em hiper e supermercados, 76% das compras são decididas dentro da loja. É ali que a sua marca ganha ou perde o shopper.</p>
+          <div class="ticks" id="ticks" data-a="fade" style="--d:4"></div>
+          <div class="tl" data-a="fade" style="--d:4"><span>100 compras</span><span><b style="color:var(--teal)">76</b> decididas na loja</span></div>
+        </div>
+      </div>
+      <p class="src">Fonte: POPAI Brasil, estudo de comportamento do consumidor em hiper e supermercados.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 04 · 29% NUNCA CHEGAM À LOJA ═══ -->
+  <section class="slide lt s4" data-tone="lt" data-t="Quase 1 em cada 3 displays nunca chega ao salão">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">O problema</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">O que acontece com o display comprado</div>
+      <h2 data-a style="--d:1">Quase 1 em cada 3 displays <em>nunca chega ao salão de vendas</em>.</h2>
+      <div class="wrap">
+        <div data-a="fade" style="--d:2">
+          <div class="waf" id="waf"></div>
+          <div class="leg"><span><i></i>71 instalados</span><span><i class="x"></i>29 nunca instalados</span></div>
+        </div>
+        <div class="stats">
+          <div class="st" data-a="right" style="--d:3"><b class="r"><span data-cu="29">0</span>%</b><p><strong>nunca foram montados.</strong> Ficaram no estoque da loja durante toda a campanha.</p></div>
+          <div class="st" data-a="right" style="--d:4"><b><span data-cu="62">0</span>%</b><p><strong>do período previsto:</strong> foi o tempo médio em que os displays instalados ficaram de pé.</p></div>
+          <div class="st" data-a="right" style="--d:5"><b><span data-cu="2">0</span>%</b><p><strong>foram montados e retirados no prazo</strong> combinado com a marca.</p></div>
+          <div class="note" data-a style="--d:7"><svg class="ico"><use href="#i-eye"/></svg><span>Quem descobriu foi um sensor dentro de cada display. Sem ele, a marca só sabe o que o relatório do promotor conta.</span></div>
+        </div>
+      </div>
+      <p class="src">Fonte: Agarwal, Stamatopoulos e Zeng, "Promotional Inventory Displays: An Empirical Analysis Using IoT Data", Manufacturing &amp; Service Operations Management, 2024 (15 mil displays em 5 mil lojas de uma rede dos EUA); McCombs School of Business, Universidade do Texas, 2024.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 05 · O CUSTO ESCONDIDO ═══ -->
+  <section class="slide s5" data-tone="lt" data-bot="dk" data-t="O custo escondido do display próprio">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">O problema</div>
+    <svg class="berg" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="318,333 352,292 398,268 452,286 486,318 496,333" fill="#fff" stroke="rgba(6,27,73,.2)" stroke-width="2"/>
+      <polygon points="300,350 510,350 700,420 744,610 660,790 420,858 180,780 112,580 168,430" fill="rgba(255,255,255,.045)" stroke="rgba(255,255,255,.16)" stroke-width="2" stroke-dasharray="6 8"/>
+    </svg>
+    <svg class="wave" viewBox="0 0 3200 36" preserveAspectRatio="none" aria-hidden="true"><path d="M0 18 Q100 4 200 18 T400 18 T600 18 T800 18 T1000 18 T1200 18 T1400 18 T1600 18 T1800 18 T2000 18 T2200 18 T2400 18 T2600 18 T2800 18 T3000 18 T3200 18 V36 H0z" fill="#0B2763"/></svg>
+    <div class="m">
+      <div class="hd">
+        <div class="ey" data-a style="--d:0">O display próprio</div>
+        <h2 data-a style="--d:1">O preço do móvel é só a ponta. <em>O resto do custo fica escondido.</em></h2>
+      </div>
+      <div class="tip" data-a="fade" style="--d:2"><small>O que aparece</small><b>Display R$ 3.200</b></div>
+      <div class="hid" data-rt="custo">
+        <button data-rt-i="0" data-a style="--d:3"><b>Instalação</b><small>em cada loja</small></button>
+        <button data-rt-i="1" data-a style="--d:4"><b>Manutenção</b><small>todo mês</small></button>
+        <button data-rt-i="2" data-a style="--d:5"><b>Display parado</b><small>no estoque da loja</small></button>
+        <button data-rt-i="3" data-a style="--d:6"><b>Nova campanha</b><small>móvel novo</small></button>
+        <button data-rt-i="4" data-a style="--d:7"><b>Auditoria</b><small>visita para conferir</small></button>
+        <button data-rt-i="5" data-a style="--d:8"><b>Capital parado</b><small>no balanço</small></button>
+      </div>
+      <div class="det no-pdf" data-a="right" style="--d:4"><div id="custoDet"></div>
+        <div class="clk" style="margin-top:26px"><svg><use href="#i-hand"/></svg>Clique em cada custo escondido</div></div>
+      <div class="det pdf-only" id="custoPdf" style="top:40%"></div>
+      <p class="src">Fonte: valores de referência do plano de negócio da Códice; Agarwal, Stamatopoulos e Zeng, M&amp;SOM, 2024; Receita Federal, IN RFB 1.700/2017, anexo III (móveis: vida útil de 10 anos).</p>
+    </div>
+  </section>
+
+  <!-- ═══ 06 · QUEM ESTÁ POR TRÁS ═══ -->
+  <section class="slide s6" data-tone="dk" data-t="A fábrica e a inteligência num contrato só">
+    <div class="ph"><img src="assets/foto-montagem.jpg" alt=""></div>
+    <div class="pfoot"><img src="assets/codice-logotipo-branco.png" alt="">A solução</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Quem está por trás</div>
+      <h2 data-a style="--d:1">A fábrica e a inteligência de PDV <em>num contrato só</em>.</h2>
+      <div class="stack">
+        <div class="ly" data-a="left" style="--d:2">
+          <div class="k">Base<span>A fábrica</span></div>
+          <div class="lg"><img src="assets/neoband-wordmark-white.png" alt="NEOBAND"></div>
+          <div class="nums"><div><b>+<span data-cu="40">0</span></b><small>anos de mobiliário de PDV</small></div><div><b><span data-cu="100">0</span>%</b><small>produção no Brasil</small></div><div><b>FSC</b><small>materiais certificados</small></div><div><b>2025/26</b><small>Fornecedor do Ano, 2x</small></div></div>
+          <div class="whose">Números da NEOBAND</div>
+        </div>
+        <div class="ly" data-a="left" style="--d:3">
+          <div class="k">Inteligência<span>Trade e tecnologia</span></div>
+          <div class="lg"><img src="assets/75lab-wordmark-paper.png" alt="75 LAB"></div>
+          <div class="nums"><div><b>+<span data-cu="15">0</span></b><small>anos de trade marketing</small></div><div><b><span data-cu="15000" data-fmt="br">0</span>+</b><small>PDVs positivados</small></div><div><b><span data-cu="95">0</span>%</b><small>projetos aprovados</small></div><div><b><span data-cu="84">0</span></b><small>cases entregues</small></div></div>
+          <div class="whose">Números da 75 LAB</div>
+        </div>
+        <div class="ly cx" data-a="left" style="--d:4">
+          <div class="k">Serviço<span>Para a sua marca</span></div>
+          <div class="lg"><img src="assets/codice-logotipo.png" alt="Códice" style="height:30px"></div>
+          <p>Fabricação, instalação, manutenção, tecnologia e painel num contrato por módulo. Uma equipe responde por tudo.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 07 · A VIRADA ═══ -->
+  <section class="slide lt s7" data-tone="lt" data-t="Pare de comprar móvel, assine presença">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">A solução</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Display como serviço</div>
+      <h2 data-a style="--d:1">Pare de comprar móvel. <em>Assine presença na loja.</em></h2>
+      <div class="wrap">
+        <div>
+          <div class="inc">
+            <div data-a style="--d:2"><span class="ck"><svg><use href="#i-check"/></svg></span>Display fabricado pela NEOBAND</div>
+            <div data-a style="--d:3"><span class="ck"><svg><use href="#i-check"/></svg></span>Entrega e instalação em cada loja</div>
+            <div data-a style="--d:4"><span class="ck"><svg><use href="#i-check"/></svg></span>Manutenção preventiva e corretiva</div>
+            <div data-a style="--d:5"><span class="ck"><svg><use href="#i-check"/></svg></span>Comunicação nova na mesma estrutura</div>
+            <div data-a style="--d:6"><span class="ck"><svg><use href="#i-check"/></svg></span>Instalação registrada com foto e GPS</div>
+            <div data-a style="--d:7"><span class="ck"><svg><use href="#i-check"/></svg></span>Localização e saúde de cada display</div>
+            <div data-a style="--d:8"><span class="ck"><svg><use href="#i-check"/></svg></span>Painel e relatório da campanha</div>
+            <div data-a style="--d:9"><span class="ck"><svg><use href="#i-check"/></svg></span>Uma equipe para tudo isso</div>
+          </div>
+          <div class="pills" data-a style="--d:10"><span>Sem capital imobilizado</span><span>Despesa operacional</span><span>Escala loja a loja</span></div>
+        </div>
+        <div class="tag" data-a="pop" style="--d:4">
+          <div class="h"><span>Assinatura Códice</span><img src="assets/codice-simbolo-branco.png" alt=""></div>
+          <div class="b">
+            <small>Plano Essencial · por módulo</small>
+            <div class="pr"><span>R$</span><b><span data-cu="499">0</span></b></div>
+            <small>por mês, com tudo ao lado incluso</small>
+            <div class="bar" id="barcode"></div>
+            <p class="ft">Sensores de fluxo e tela de conteúdo entram nos planos Sense e Media, sob proposta.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 08 · COMO FUNCIONA ═══ -->
+  <section class="slide lt off s8" data-tone="lt" data-t="Como funciona, em quatro passos">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">A solução</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Como funciona</div>
+      <h2 data-a style="--d:1">Da escolha das lojas ao painel, <em>em quatro passos</em>.</h2>
+      <div class="flow">
+        <div class="line"><i></i></div>
+        <div class="st" data-a style="--d:2"><div class="img"><img src="assets/amb-loja.jpg" alt="Corredor com displays" data-lb></div><div class="dot" style="margin-top:-27px">01</div><span class="who v">Sua marca</span><h3>Escolhe lojas e formatos</h3><p>A gente ajuda a priorizar as lojas onde a marca mais vende.</p></div>
+        <div class="st" data-a style="--d:3"><div class="img"><img src="assets/foto-logistica.jpg" alt="Caminhão da Códice" data-lb></div><div class="dot" style="margin-top:-27px">02</div><span class="who c">Códice</span><h3>Fabrica e entrega</h3><p>A NEOBAND produz e a logística leva cada display até a loja.</p></div>
+        <div class="st" data-a style="--d:4"><div class="img"><img src="assets/foto-instalacao.jpg" alt="Instalação na loja" data-lb></div><div class="dot" style="margin-top:-27px">03</div><span class="who c">Códice</span><h3>Instala e registra</h3><p>Cada display entra com QR: quem instalou, onde, quando e a foto.</p></div>
+        <div class="st" data-a style="--d:5"><div class="img"><img src="assets/foto-suporte.jpg" alt="Equipe acompanhando a frota" data-lb></div><div class="dot" style="margin-top:-27px">04</div><span class="who v">Sua marca</span><h3>Acompanha e troca</h3><p>Painel com localização e dados. Campanha nova troca a arte, o móvel fica.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 09 · UM CHASSI, TODA MARCA ═══ -->
+  <section class="slide lt s9" data-tone="lt" data-t="Troque a campanha, não o móvel">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">A solução</div>
+    <div class="m">
+      <div class="top">
+        <div>
+          <div class="ey" data-a style="--d:0">Um chassi, toda marca</div>
+          <h2 data-a style="--d:1">Troque a campanha. <em>Não troque o móvel.</em></h2>
+        </div>
+        <div style="--d:2;display:flex;align-items:center;gap:28px" data-a>
+          <p class="lede" style="font-size:18px">A mesma estrutura recebe qualquer categoria: muda a arte, a ferragem (prateleira ou gancheira) e a régua de preço.</p>
+          <div class="clk no-pdf"><svg><use href="#i-hand"/></svg>Clique numa marca para girar em 3D</div>
+        </div>
+      </div>
+      <div class="wall" id="wall" data-rt="marca"></div>
+      <p class="src">Renders dos projetos de display da NEOBAND, com a comunicação das marcas aplicada.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 10 · FORMATOS ═══ -->
+  <section class="slide lt s10" data-tone="lt" data-t="Sete formatos, um preço por módulo">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">A solução</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Formatos</div>
+      <h2 data-a style="--d:1">Sete formatos. <em>Um preço por módulo.</em></h2>
+      <div class="wrap no-pdf">
+        <div class="lst" id="fmtLst" data-rt="formato" data-a="left" style="--d:2"></div>
+        <div class="mvw" data-a="fade" style="--d:3">
+          <model-viewer id="fmtMv" camera-controls disable-zoom disable-pan auto-rotate rotation-per-second="14deg" camera-orbit="20deg 80deg auto" interaction-prompt="none" shadow-intensity="1" environment-image="neutral" exposure="1.05" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" alt="Display Códice em 3D"></model-viewer>
+          <div class="hint clk"><svg><use href="#i-hand"/></svg>Arraste para girar · clique num formato</div>
+        </div>
+        <div class="info" data-a="right" style="--d:4">
+          <div id="fmtTxt"></div>
+          <div class="qr"><div class="q" id="fmtQr"></div><small><b>Veja na sua loja</b>Aponte a câmera do celular e coloque o display em tamanho real.</small></div>
+        </div>
+      </div>
+      <div class="pdf-only" id="fmtPdf" style="margin-top:30px"></div>
+      <p class="src">Medidas e módulos do catálogo de displays da Códice. Preço do plano Essencial, por módulo, por mês.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 11 · PROVA DE EXECUÇÃO ═══ -->
+  <section class="slide s11" data-tone="dk" data-t="Você sabe onde está cada display">
+    <div class="pfoot"><img src="assets/codice-logotipo-branco.png" alt="">Prova e dados</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Prova de execução</div>
+      <h2 data-a style="--d:1">Você sabe onde está cada display. <em>Hoje, não no fim da campanha.</em></h2>
+      <div class="wrap">
+        <div class="phone" data-a="left" style="--d:2">
+          <div class="ok"><svg><use href="#i-check"/></svg>Instalação registrada</div>
+          <div class="fach"><img src="assets/amb-tecnico.jpg" alt="Foto da instalação na loja"><span>Foto tirada na instalação</span></div>
+          <div class="r"><span>Display</span><b>Ilha 4 módulos · CDX 0142</b></div>
+          <div class="r"><span>Loja</span><b>Supermercado · Campinas, SP</b></div>
+          <div class="r"><span>Quando</span><b>14/10 às 09:42</b></div>
+          <div class="r"><span>Onde</span><b>GPS a 12 m da loja</b></div>
+          <div class="r" style="border:0"><span>Quem</span><b>Equipe de instalação</b></div>
+          <p class="ex">Exemplo ilustrativo do registro feito pelo QR</p>
+        </div>
+        <div>
+          <div class="scr" data-a="right" style="--d:3"><div class="bar"><i></i><i></i><i></i></div><img src="assets/sis-mapa.jpg" alt="Mapa da frota na plataforma Códice" data-lb><span class="zoom"><svg><use href="#i-zoom"/></svg>Clique para ampliar</span></div>
+          <div class="pr">
+            <div data-a style="--d:4"><svg class="ico"><use href="#i-qr"/></svg><span><b>Registro por QR</b><small>Quem instalou, onde, quando e com foto.</small></span></div>
+            <div data-a style="--d:5"><svg class="ico"><use href="#i-pin"/></svg><span><b>Localização</b><small>Cada display no mapa, do depósito até a loja.</small></span></div>
+            <div data-a style="--d:6"><svg class="ico"><use href="#i-wrench"/></svg><span><b>Vistoria e reparo</b><small>Histórico de visitas e chamados por display.</small></span></div>
+          </div>
+        </div>
+      </div>
+      <p class="src">Telas da plataforma Códice em modo demonstração, com dados fictícios.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 12 · DADOS DO DISPLAY ═══ -->
+  <section class="slide lt s12" data-tone="lt" data-t="O display conta quem passa">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">Prova e dados</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Tecnologia embarcada</div>
+      <h2 data-a style="--d:1">O display conta quem passa. <em>A marca decide com dado.</em></h2>
+      <div class="wrap">
+        <div class="disp" data-a="fade" style="--d:2">
+          <img class="d" src="assets/p/ilha.webp" alt="Ilha Códice">
+          <button class="hs" data-hs="0" style="left:50%;top:13%">1</button>
+          <button class="hs" data-hs="1" style="left:31%;top:44%">2</button>
+          <button class="hs" data-hs="2" style="left:66%;top:62%">3</button>
+          <button class="hs" data-hs="3" style="left:44%;top:90%">4</button>
+        </div>
+        <div class="pan">
+          <div class="tabs" id="hsTabs" data-rt="sensor" data-a style="--d:3"></div>
+          <div id="hsDet" class="no-pdf"></div>
+          <div id="hsPdf" class="pdf-only"></div>
+          <div class="clk no-pdf"><svg><use href="#i-hand"/></svg>Clique nos números do display ou nas abas</div>
+          <div class="low" data-a style="--d:5">
+            <div class="thumb"><img src="assets/sis-sensores.jpg" alt="Painel de sensores da Códice" data-lb><span class="zoom"><svg><use href="#i-zoom"/></svg>Ampliar</span></div>
+            <div class="priv"><svg class="ico"><use href="#i-lock"/></svg><span>Contagem agregada, sem reconhecimento facial e sem identificar o shopper.</span></div>
+          </div>
+        </div>
+      </div>
+      <p class="src">Painel em modo demonstração, com dados fictícios. Sensores e tela conforme o plano contratado.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 13 · COMPRAR OU ASSINAR ═══ -->
+  <section class="slide lt off s13" data-tone="lt" data-t="Comprar ou assinar">
+    <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">Investimento</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Comprar ou assinar</div>
+      <h2 data-a style="--d:1">Comprar imobiliza capital. <em>Assinar vira despesa do mês.</em></h2>
+      <div class="wrap">
+        <div class="cd a" data-a="left" style="--d:2">
+          <span class="k">Primeiro mês, por módulo</span>
+          <h3>O caixa que fica livre</h3>
+          <div class="cmp" id="cmp">
+            <div><div class="l"><span>Comprar o display</span><b>R$ 3.620</b></div>
+              <div class="tr"><i style="background:#061B49" data-w="100"></i><i style="background:#4E6BA8" data-w="0"></i></div>
+              <small>Display R$ 3.200 · instalação R$ 350 · manutenção R$ 70</small></div>
+            <div><div class="l"><span>Assinar a Códice</span><b style="color:var(--teal-ink)">R$ 499</b></div>
+              <div class="tr"><i style="background:var(--teal)" data-w="13.8"></i></div>
+              <small>Display, instalação, manutenção e plataforma inclusos</small></div>
+          </div>
+          <div class="sav"><b><span data-cu="86">0</span>%</b><p>menos saída de caixa no primeiro mês, e nenhum móvel parado no balanço.</p></div>
+        </div>
+        <div class="cd b" data-a="right" style="--d:3">
+          <span class="k">Custo efetivo da assinatura</span>
+          <h3>No Lucro Real, parte volta em imposto</h3>
+          <div class="cols">
+            <div class="col"><span class="v">R$ 499</span><div class="bx" style="--h:100%;--t:0%"><span class="e"></span></div><small><b>Simples ou Presumido</b>sem efeito</small></div>
+            <div class="col"><span class="v">R$ 379</span><div class="bx" style="--h:100%;--t:24%"><span class="e"></span><span class="t"></span></div><small><b>Lucro Real 24%</b>lucro até R$ 20 mil/mês</small></div>
+            <div class="col"><span class="v" style="color:var(--teal)">R$ 329</span><div class="bx" style="--h:100%;--t:34%"><span class="e"></span><span class="t"></span></div><small><b>Lucro Real 34%</b>grandes indústrias</small></div>
+          </div>
+          <div class="lg"><span><i></i>Custo efetivo</span><span><i class="t"></i>IRPJ e CSLL que deixam de ser pagos</span></div>
+          <p class="ft">A assinatura é despesa operacional: reduz a base do IRPJ (15% mais adicional de 10%) e da CSLL (9%). Na compra, o display vira ativo e deprecia 10% ao ano. Em prazos longos a compra pode custar menos no papel: a assinatura ganha em caixa, risco e serviço. Valide com a sua contabilidade.</p>
+        </div>
+      </div>
+      <p class="src">Fonte: valores de referência do plano de negócio da Códice; Regulamento do Imposto de Renda (Decreto 9.580/2018, art. 311); Lei 9.249/1995; IN RFB 1.700/2017, anexo III.</p>
+    </div>
+  </section>
+
+  <!-- ═══ 14 · SIMULADOR ═══ -->
+  <section class="slide s14" data-tone="dk" data-t="Simule o seu programa">
+    <div class="pfoot"><img src="assets/codice-logotipo-branco.png" alt="">Investimento</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Simulador</div>
+      <h2 data-a style="--d:1">Monte o seu programa. <em>O investimento sai na hora.</em></h2>
+      <div class="wrap">
+        <div class="ctl" data-a="left" style="--d:2">
+          <div><label>Lojas no programa <b id="vL">100</b></label><input type="range" id="iL" min="10" max="1000" step="10" value="100" aria-label="Lojas no programa"></div>
+          <div><label>Formato por loja</label><div class="seg" id="iF"><button data-v="1" class="on">Torre<small>1 módulo</small></button><button data-v="2">Duplo<small>2 módulos</small></button><button data-v="4">Ilha<small>4 módulos</small></button></div></div>
+          <div><label>Período</label><div class="seg" id="iM"><button data-v="3">3 meses</button><button data-v="6">6 meses</button><button data-v="12" class="on">12 meses</button><button data-v="24">24 meses</button></div></div>
+          <div><label>Regime tributário da sua empresa</label><div class="seg" id="iR"><button data-v=".34" class="on">Lucro Real<small>34%</small></button><button data-v=".24">Lucro Real<small>24%</small></button><button data-v="0">Presumido<small>ou Simples</small></button></div></div>
+          <div class="clk no-pdf"><svg><use href="#i-hand"/></svg>Arraste e clique para montar o seu cenário</div>
+        </div>
+        <div class="out" data-a="right" style="--d:3">
+          <div class="hero"><small>Assinatura por mês</small><b id="oMes">R$ 0</b><span id="oDesc"></span></div>
+          <div class="kp">
+            <div><small>Total no período</small><b id="oTot">R$ 0</b></div>
+            <div><small>Imposto que deixa de ser pago</small><b id="oImp" class="t">R$ 0</b></div>
+            <div><small>Custo efetivo no período</small><b id="oEf">R$ 0</b></div>
+          </div>
+          <div class="vs">
+            <div class="r"><span>Comprar: 1º mês</span><div class="tr"><i id="bC" style="background:#9AA7C4"></i></div><b id="oC">R$ 0</b></div>
+            <div class="r"><span>Assinar: 1º mês</span><div class="tr"><i id="bA" style="background:var(--teal)"></i></div><b id="oA">R$ 0</b></div>
+            <p>Referência de compra por módulo: display R$ 3.200, instalação R$ 350 e manutenção R$ 70 por mês, do plano de negócio da Códice. Valores sem frete e sem a produção da arte.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 15 · PRÓXIMO PASSO ═══ -->
+  <section class="slide s15" data-tone="dk" data-t="Próximo passo">
+    <div class="pfoot"><img src="assets/codice-logotipo-branco.png" alt="">Próximo passo</div>
+    <div class="m">
+      <div class="ey" data-a style="--d:0">Próximo passo</div>
+      <h2 data-a style="--d:1">76% decidem na loja. <em>A sua marca vai estar lá?</em></h2>
+      <div class="steps">
+        <div data-a style="--d:2"><b>01</b><h3>Conversa de 30 minutos</h3><p>Formatos, lojas prioritárias e calendário de campanhas.</p></div>
+        <div data-a style="--d:3"><b>02</b><h3>Proposta por loja</h3><p>Preço, prazo e plano de instalação de cada ponto.</p></div>
+        <div data-a style="--d:4"><b>03</b><h3>Todas as lojas de uma vez</h3><p>Sem piloto: o programa entra inteiro no canal escolhido.</p></div>
+      </div>
+      <div class="acts" data-a style="--d:5">
+        <a class="btn pri" href="https://wa.me/5511986765634?text=Ol%C3%A1!%20Vi%20a%20apresenta%C3%A7%C3%A3o%20da%20C%C3%B3dice%20para%20a%20ind%C3%BAstria%20e%20quero%20conversar." target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Falar no WhatsApp</a>
+        <a class="btn gho" href="mailto:contato@75lab.com.br?subject=C%C3%B3dice%20para%20a%20ind%C3%BAstria"><svg><use href="#i-mail"/></svg>contato@75lab.com.br</a>
+        <button class="btn gho no-pdf" data-go="0">Rever a apresentação</button>
+      </div>
+      <div class="inst" data-a="fade" style="--d:6">
+        <p><b>75 LAB Estratégia, Design e Produção Ltda</b> · CNPJ 55.470.982/0001-77<br>CENU · Centro Empresarial das Nações Unidas, Torre Norte, Av. das Nações Unidas, 12.901, Brooklin, São Paulo, SP<br>75lab.com.br · WhatsApp (11) 98676-5634 · Displays fabricados pela NEOBAND</p>
+        <div class="lg"><img src="assets/codice-logotipo-branco.png" alt="Códice"><img src="assets/neoband-wordmark-white.png" alt="NEOBAND" style="height:24px"><img src="assets/75lab-wordmark-paper.png" alt="75 LAB" style="height:26px"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="bot">
+    <div id="prog"><i></i></div>
+    <span id="count">01 / 15</span>
+    <button class="nb" id="prev" aria-label="Tela anterior"><svg><use href="#i-l"/></svg></button>
+    <button class="nb" id="next" aria-label="Próxima tela"><svg><use href="#i-r"/></svg></button>
+  </footer>
+
+  <div id="menu">
+    <div class="ey" style="color:var(--teal)">Índice da apresentação</div>
+    <button class="nb x" id="mClose" aria-label="Fechar o índice"><svg><use href="#i-x"/></svg></button>
+    <div class="cols" id="mCols"></div>
+  </div>
+
+  <div id="cv"><img src="assets/codice-simbolo-branco.png" alt=""></div>
+</div>
+</div>
+
+<div id="lb" role="dialog" aria-modal="true"><button class="cl" id="lbX" aria-label="Fechar"><svg><use href="#i-x"/></svg></button><div class="in" id="lbIn"></div></div>
+
+<div id="rotate">
+  <img src="assets/codice-logotipo-branco.png" alt="Códice">
+  <b>Gire o celular</b>
+  <span>Esta apresentação foi feita para a tela deitada. Vire o aparelho para ver tudo.</span>
+</div>
+
+<div id="gate" role="dialog" aria-modal="true" aria-labelledby="gtTit">
+  <div class="gt-card" id="gtCard">
+    <div class="gt-logo">
+      <img class="s" src="assets/codice-simbolo.png" alt="">
+      <img class="w" src="assets/codice-logotipo.png" alt="Códice">
+      <i></i>
+      <img class="l" src="assets/75lab-wordmark-black.png" alt="75 LAB">
+    </div>
+    <div id="gtCad">
+      <h1 id="gtTit">A sua proposta está pronta.</h1>
+      <p class="sub">Diga quem é você para abrir a apresentação.</p>
+      <form class="gt-form" id="gtForm" novalidate>
+        <div class="gt-f" data-c="nome"><label for="gtNome">Nome completo</label>
+          <input id="gtNome" name="nome" autocomplete="name" maxlength="120" placeholder="Seu nome"><small>Escreva o seu nome.</small></div>
+        <div class="gt-f" data-c="email"><label for="gtEmail">E-mail</label>
+          <input id="gtEmail" name="email" type="email" autocomplete="email" inputmode="email" maxlength="254" placeholder="voce@empresa.com.br"><small>Confira o e-mail.</small></div>
+        <div class="gt-f" data-c="telefone"><label for="gtTel">Telefone ou WhatsApp</label>
+          <input id="gtTel" name="telefone" type="tel" autocomplete="tel" inputmode="tel" maxlength="20" placeholder="(11) 90000-0000"><small>Coloque o DDD e o número.</small></div>
+        <div class="gt-f" data-c="quem"><label for="gtQuem">Quem te enviou o link?</label>
+          <input id="gtQuem" name="quem" maxlength="120" placeholder="Nome de quem te enviou"><small>Conte quem te enviou o link.</small></div>
+        <div class="gt-isca" aria-hidden="true"><label for="gtSite">Site</label><input id="gtSite" name="site" tabindex="-1" autocomplete="off"></div>
+        <div class="gt-ck" data-c="aceite">
+          <label for="gtAceite"><input type="checkbox" id="gtAceite" name="aceite">
+            <span>Li e concordo com os <button type="button" class="gt-link" id="gtVerTermos">termos de privacidade</button>.</span></label>
+          <small>Para abrir a apresentação, aceite os termos.</small>
+        </div>
+        <p class="gt-msg" id="gtMsg"></p>
+        <button type="submit" class="gt-btn" id="gtBtn"><span>Abrir a apresentação</span><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </form>
+      <p class="gt-pe"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>Seus dados não são vendidos nem repassados a terceiros.</p>
+    </div>
+    <div id="gtTermos">
+      <h1>Termos de privacidade</h1>
+      <p class="ver">Versão de 30 de outubro de 2026</p>
+      <ol>
+        <li><b>Quem cuida dos dados</b>75 LAB Estratégia, Design e Produção Ltda, CNPJ 55.470.982/0001-77, parceira da NEOBAND na Códice.</li>
+        <li><b>O que coletamos</b>Nome, e-mail, telefone, quem te enviou o link e a data e hora do acesso.</li>
+        <li><b>Para que usamos</b>Saber quem abriu a proposta, retornar o contato comercial sobre a Códice e reconhecer quem fez a indicação.</li>
+        <li><b>Base legal</b>O seu consentimento, dado ao marcar a caixa de aceite (LGPD, art. 7º, I).</li>
+        <li><b>Com quem compartilhamos</b>Só entre a 75 LAB e a NEOBAND, para o atendimento comercial da Códice. Nada é vendido ou cedido a terceiros.</li>
+        <li><b>Onde e por quanto tempo</b>Em servidores de nuvem protegidos, com acesso restrito à equipe comercial, por até 2 anos depois do último contato ou até você pedir a exclusão.</li>
+        <li><b>Seus direitos</b>Pedir acesso, correção ou exclusão dos dados e retirar o consentimento quando quiser, pelo e-mail contato@75lab.com.br (LGPD, art. 18).</li>
+        <li><b>Nesta página</b>Não usamos cookies de rastreamento. O navegador guarda só um aviso de que você já se identificou, para não pedir de novo.</li>
+      </ol>
+      <div class="gt-acts">
+        <button type="button" class="gt-btn gt-sec" id="gtVoltar">Voltar</button>
+        <button type="button" class="gt-btn" id="gtConcordo">Li e concordo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="cur"></div><div id="curDot"></div>
+
+<script>
+(function(){
+"use strict";
+var $=function(s,c){return (c||document).querySelector(s)};
+var $$=function(s,c){return [].slice.call((c||document).querySelectorAll(s))};
+var html=document.documentElement,PDF=html.classList.contains("pdf");
+var gated=function(){return html.classList.contains("gated")};
+var BRL=function(v){return "R$ "+Math.round(v).toLocaleString("pt-BR")};
+var AR_UNIV="https://projetos.75lab.com.br/ar/codice-display-universal/",AR_NGV="https://projetos.75lab.com.br/ar/ngv-displays/";
+function qrSvg(url){if(!window.qrcode)return "";var q=qrcode(0,"M");q.addData(url);q.make();return q.createSvgTag({cellSize:4,margin:0,scalable:true})}
+
+/* ─────── Cursor ─────── */
+var cur=$("#cur"),dot=$("#curDot"),tx=innerWidth/2,ty=innerHeight/2,cx=tx,cy=ty;
+addEventListener("mousemove",function(e){tx=e.clientX;ty=e.clientY;document.body.classList.remove("hidecur");dot.style.transform="translate3d("+tx+"px,"+ty+"px,0)"});
+addEventListener("mouseleave",function(){document.body.classList.add("hidecur")});
+(function loop(){cx+=(tx-cx)*.24;cy+=(ty-cy)*.24;cur.style.transform="translate3d("+cx+"px,"+cy+"px,0)";requestAnimationFrame(loop)})();
+addEventListener("mouseover",function(e){document.body.classList.toggle("hot",!!e.target.closest("button,a,input,label,[data-go],[data-lb],model-viewer,.br"))});
+
+/* ─────── Palco ─────── */
+var stage=$("#stage"),deck=$("#deck");
+function fit(){if(PDF)return;var w=deck.clientWidth||innerWidth,h=deck.clientHeight||innerHeight,s=Math.min(w/1600,h/900);if(s>0)stage.style.transform="scale("+s+")"}
+addEventListener("resize",fit);addEventListener("orientationchange",fit);fit();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fit);
+
+var slides=$$(".slide:not(.pdf-only)"),N=slides.length,i=0,busy=false;
+var CAPS=[["Abertura",0,1],["O problema",2,4],["A solução",5,9],["Prova e dados",10,11],["Investimento",12,13],["Próximo passo",14,14]];
+function capDe(k){for(var c=0;c<CAPS.length;c++)if(k>=CAPS[c][1]&&k<=CAPS[c][2])return c;return 0}
+function setChrome(){
+  var s=slides[i];stage.classList.toggle("tone-lt",s.dataset.tone==="lt");stage.classList.toggle("bot-dk",s.dataset.bot==="dk");
+  $("#count").textContent=String(i+1).padStart(2,"0")+" / "+String(N).padStart(2,"0");
+  $("#prog i").style.width=((i+1)/N*100)+"%";
+  var c=capDe(i);$("#chap").textContent=!i?"":c?String(c).padStart(2,"0")+" · "+CAPS[c][0]:"Resumo executivo";
+  if(!PDF)history.replaceState(null,"",i?"#"+(i+1):location.pathname+location.search);
+}
+
+/* ─────── Números que contam ─────── */
+function countUp(sec){
+  $$("[data-cu]",sec).forEach(function(e){
+    var end=+e.dataset.cu,fmt=e.dataset.fmt,t0=null,dur=1200;
+    function txt(v){return fmt?Math.round(v).toLocaleString("pt-BR"):String(Math.round(v))}
+    if(PDF){e.textContent=txt(end);return}
+    e.textContent="0";
+    function step(ts){if(!t0)t0=ts;var p=Math.min((ts-t0)/dur,1),k=1-Math.pow(1-p,3);e.textContent=txt(end*k);if(p<1)requestAnimationFrame(step)}
+    requestAnimationFrame(step)});
+}
+
+/* ─────── Roteiro: abre um item por vez, com tempo do tamanho do texto; o 1º clique de verdade para ─────── */
+var RT={tm:null,box:null};
+var ROT={};
+function rtStop(){clearTimeout(RT.tm);if(RT.box)$$("[data-rt-i]",RT.box).forEach(function(b){b.classList.remove("rt-run")});RT.box=null}
+function rtStart(sec){
+  rtStop();var box=$("[data-rt]",sec);if(!box||PDF)return;
+  var nome=box.dataset.rt,its=$$("[data-rt-i]",box),k=0;if(!its.length||!ROT[nome])return;
+  RT.box=box;
+  (function passo(){
+    if(RT.box!==box)return;
+    var el=its[k],ms=Math.max(ROT[nome].ms||0,Math.min(9000,3200+(ROT[nome].texto(k)||"").length*30));
+    ROT[nome].mostrar(k);
+    its.forEach(function(b){b.classList.remove("rt-run")});void el.offsetWidth;
+    el.style.setProperty("--rt",ms+"ms");el.classList.add("rt-run");
+    RT.tm=setTimeout(function(){k=(k+1)%its.length;passo()},ms);
+  })();
+}
+document.addEventListener("click",function(e){if(e.isTrusted&&RT.box&&slides[i].contains(e.target))rtStop()},true);
+
+/* ─────── Navegação ─────── */
+var ENTER={};
+function onEnter(sec){countUp(sec);var k=slides.indexOf(sec);if(ENTER[k])ENTER[k](sec);rtStart(sec)}
+function go(n,quiet){
+  n=Math.max(0,Math.min(N-1,n));if(n===i||busy||gated())return;
+  busy=true;rtStop();closeMenu();
+  var old=slides[i],nu=slides[n];
+  function swap(){old.classList.remove("on");i=n;nu.classList.add("on");setChrome();onEnter(nu)}
+  if(quiet||matchMedia("(prefers-reduced-motion: reduce)").matches){swap();busy=false;return}
+  var cv=$("#cv");cv.className="";void cv.offsetWidth;cv.classList.add("go");
+  setTimeout(function(){swap();cv.className="out"},380);
+  setTimeout(function(){cv.className="";busy=false},880);
+}
+document.addEventListener("click",function(e){var g=e.target.closest("[data-go]");if(g){e.preventDefault();go(+g.dataset.go)}});
+$("#prev").addEventListener("click",function(){go(i-1)});
+$("#next").addEventListener("click",function(){go(i+1)});
+
+/* ─────── Índice ─────── */
+var menu=$("#menu");
+function closeMenu(){menu.classList.remove("on")}
+var MENU=[["Abertura e problema",0,4],["A solução",5,9],["Prova e dados",10,11],["Investimento",12,13],["Próximo passo",14,14]];
+$("#mCols").innerHTML=MENU.map(function(c){var lis="";for(var k=c[1];k<=c[2];k++)lis+='<button data-go="'+k+'"><b>'+String(k+1).padStart(2,"0")+'</b><span>'+slides[k].dataset.t+'</span></button>';
+  return '<div><h4>'+c[0]+'</h4>'+lis+'</div>'}).join("");
+$("#bIdx").addEventListener("click",function(){menu.classList.toggle("on")});
+$("#mClose").addEventListener("click",closeMenu);
+
+/* ─────── Teclado e toque ─────── */
+addEventListener("keydown",function(e){
+  if(gated())return;
+  if(lb.classList.contains("on")){if(e.key==="Escape")lbHide();return}
+  if(e.target.closest&&e.target.closest("input,textarea,select"))return;
+  if(e.key==="ArrowRight"||e.key==="PageDown"||e.key===" "){e.preventDefault();go(i+1)}
+  else if(e.key==="ArrowLeft"||e.key==="PageUp"){e.preventDefault();go(i-1)}
+  else if(e.key==="Home")go(0);else if(e.key==="End")go(N-1);
+  else if(e.key==="Escape")closeMenu();
+});
+var sx=0,sy=0;
+addEventListener("touchstart",function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+addEventListener("touchend",function(e){if(gated()||lb.classList.contains("on")||(e.target.closest&&e.target.closest("input,model-viewer")))return;
+  var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>56&&Math.abs(dx)>Math.abs(dy))go(dx<0?i+1:i-1)},{passive:true});
+
+/* ─────── Ampliação: imagem ou 3D ─────── */
+var lb=$("#lb"),lbIn=$("#lbIn");
+function lbHide(){lb.classList.remove("on");lbIn.innerHTML=""}
+function lbImg(src,alt){lbIn.innerHTML='<img src="'+src+'" alt="'+(alt||"")+'">';lb.classList.add("on")}
+function lb3d(m){
+  lbIn.innerHTML='<model-viewer src="'+m.glb+'" ios-src="'+m.usdz+'" poster="'+m.img+'" camera-controls disable-zoom auto-rotate rotation-per-second="16deg" camera-orbit="20deg 80deg auto" shadow-intensity="1" environment-image="neutral" exposure="1.05" ar ar-modes="webxr scene-viewer quick-look" ar-placement="floor" alt="'+m.nome+' em 3D"></model-viewer>'+
+    '<div class="side"><h3>'+m.nome+'</h3><p>'+m.cat+'. '+m.d+'</p><div class="q">'+qrSvg(m.ar)+'</div><small>Aponte a câmera do celular para ver o display em tamanho real.</small></div>';
+  lb.classList.add("on");
+}
+document.addEventListener("click",function(e){var im=e.target.closest("[data-lb]");if(im&&!gated()){lbImg(im.dataset.lb||im.getAttribute("src"),im.alt)}});
+$("#lbX").addEventListener("click",lbHide);
+lb.addEventListener("click",function(e){if(e.target===lb)lbHide()});
+
+/* ─────── 03 · régua de 100 compras ─────── */
+$("#ticks").innerHTML=new Array(100).join(".").split(".").map(function(){return "<i></i>"}).join("");
+ENTER[2]=function(){var t=$$("#ticks i");t.forEach(function(x){x.classList.remove("on")});
+  t.forEach(function(x,k){if(k<76){if(PDF)x.classList.add("on");else setTimeout(function(){x.classList.add("on")},500+k*14)}})};
+
+/* ─────── 04 · 100 displays, 29 nunca instalados ─────── */
+var SUMIU=[3,8,12,17,21,26,30,34,39,43,47,52,55,58,61,64,67,70,73,76,79,82,85,88,91,93,95,97,99];
+$("#waf").innerHTML=new Array(101).join(".").split(".").slice(0,100).map(function(){return "<i></i>"}).join("");
+ENTER[3]=function(){var w=$$("#waf i");w.forEach(function(x){x.classList.remove("x")});
+  SUMIU.forEach(function(n,k){if(PDF)w[n].classList.add("x");else setTimeout(function(){w[n].classList.add("x")},700+k*55)})};
+
+/* ─────── 05 · custos escondidos ─────── */
+var CUSTO=[
+ {t:"Instalação",v:"R$ 350 por display",d:"Equipe, deslocamento e montagem em cada loja, pagos antes de o display vender o primeiro produto."},
+ {t:"Manutenção",v:"R$ 70 por mês",d:"Régua solta, peça quebrada, adesivo descascando: o reparo é da marca, loja por loja."},
+ {t:"Display parado",v:"29% nunca instalados",d:"Produzido, pago e entregue, mas esquecido no estoque da loja durante toda a campanha."},
+ {t:"Nova campanha",v:"móvel novo",d:"Mudou a campanha, muda o projeto: o ciclo de produção, frete e montagem começa de novo."},
+ {t:"Auditoria",v:"visita para conferir",d:"Promotor ou agência rodando loja por loja só para saber se o display está de pé."},
+ {t:"Capital parado",v:"10% ao ano",d:"O móvel entra no ativo e deprecia em 10 anos, mas o dinheiro sai todo no primeiro mês."}];
+ROT.custo={texto:function(k){return CUSTO[k].d},mostrar:function(k){
+  $$(".s5 .hid button").forEach(function(b,j){b.classList.toggle("on",j===k)});
+  var c=CUSTO[k];$("#custoDet").innerHTML='<div class="swap"><div class="k">Custo escondido '+String(k+1).padStart(2,"0")+' de 06</div><h3>'+c.t+'</h3><div class="v">'+c.v+'</div><p>'+c.d+'</p></div>'}};
+$$(".s5 .hid button").forEach(function(b,k){b.addEventListener("click",function(){ROT.custo.mostrar(k)})});
+ROT.custo.mostrar(0);
+$("#custoPdf").innerHTML=CUSTO.map(function(c){return '<div style="margin-bottom:12px"><b style="font-family:\'Exo 2\';font-size:20px">'+c.t+' · <span style="color:var(--teal)">'+c.v+'</span></b><p style="font-size:14.5px;margin-top:2px">'+c.d+'</p></div>'}).join("");
+
+/* ─────── 07 · código de barras da etiqueta ─────── */
+$("#barcode").innerHTML=[3,1,2,1,3,2,1,1,3,1,2,3,1,2,1,3,1,1,2,3,1,2,1,1,3,2,1,3,1,2,1,2,3,1].map(function(w,k){return '<i style="flex:'+w+';opacity:'+(k%2?0:1)+'"></i>'}).join("");
+
+/* ─────── 09 · parede de marcas ─────── */
+var MARCAS=[
+ {id:"lacta",nome:"Lacta",cat:"Chocolate",img:"assets/p/lacta.webp",h:320,base:AR_UNIV,d:"Ilha de 4 módulos com prateleiras."},
+ {id:"pedigree-whiskas",nome:"Pedigree e Whiskas",cat:"Pet",img:"assets/p/pedigree-whiskas.webp",h:320,base:AR_UNIV,d:"Duas marcas do mesmo fabricante, uma frente para cada."},
+ {id:"bellafio",nome:"Bella Fio",cat:"Beleza",img:"assets/p/ngv-bellafio.webp",h:430,base:AR_NGV,d:"Módulo com gancheira do topo à base."},
+ {id:"bis",nome:"Bis",cat:"Chocolate",img:"assets/p/bis.webp",h:360,base:AR_UNIV,d:"O mesmo móvel da Lacta, com outra campanha."},
+ {id:"savedent",nome:"Savedent",cat:"Higiene oral",img:"assets/p/ngv-savedent.webp",h:430,base:AR_NGV,d:"Módulo com gancheira para blister."},
+ {id:"dellares",nome:"De Llares",cat:"Casa",img:"assets/p/ngv-dellares.webp",h:430,base:AR_NGV,d:"Módulo com prateleiras e régua de preço."},
+ {id:"vitalitabs",nome:"Vitalitabs",cat:"Saúde",img:"assets/p/ngv-vitalitabs.webp",h:430,base:AR_NGV,d:"Módulo com prateleiras para suplementos."}];
+MARCAS.forEach(function(m){m.glb=m.base+m.id+".glb";m.usdz=m.base+m.id+".usdz";m.ar=m.base+"?modelo="+m.id});
+$("#wall").innerHTML=MARCAS.map(function(m,k){return '<button class="br" data-rt-i="'+k+'" data-a style="--d:'+(3+k)+'"><img src="'+m.img+'" alt="Display com a marca '+m.nome+'" style="--h:'+m.h+'px"><span class="cap"><b>'+m.nome+'</b><small>'+m.cat+'</small></span></button>'}).join("");
+ROT.marca={texto:function(k){return MARCAS[k].d+MARCAS[k].nome},mostrar:function(k){$$("#wall .br").forEach(function(b,j){b.classList.toggle("on",j===k)})}};
+$$("#wall .br").forEach(function(b,k){b.addEventListener("click",function(e){if(e.isTrusted)lb3d(MARCAS[k])})});
+
+/* ─────── 10 · formatos em 3D ─────── */
+var FMT=[
+ {id:"torre",t:"Torre",m:1,d:"Módulo único: uma frente de marca no menor espaço da loja.",uso:"Ponta de gôndola e corredor",med:"170 × 62 × 65 cm"},
+ {id:"duplo",t:"Duplo",m:2,d:"Dois módulos lado a lado, duas frentes da marca num ponto só.",uso:"Dobrar a exposição",med:"170 × 110 × 56 cm"},
+ {id:"ilha",t:"Ilha",m:4,d:"Quatro frentes de marca: alto impacto no meio do corredor.",uso:"Dominar uma categoria",med:"170 × 111 × 112 cm"},
+ {id:"ilha-frentes",t:"Ilha de 2 frentes",m:4,d:"A ilha montada em duas grandes frentes.",uso:"Duas marcas da casa",med:"170 × 112 × 112 cm"},
+ {id:"baixa",t:"Ilha baixa",m:4,d:"90 cm de altura: impacto sem fechar a visão da loja.",uso:"Pontas e áreas de fluxo",med:"90 × 112 × 110 cm"},
+ {id:"baixa-aereo",t:"Ilha baixa com aéreo",m:4,d:"Ilha baixa com testeira aérea, vista do outro lado da loja.",uso:"Chamar de longe",med:"118 × 112 × 110 cm"},
+ {id:"baixa-torre",t:"Ilha baixa com torre",m:4,d:"Ilha baixa com uma torre central elevada.",uso:"Destaque central",med:"118 × 112 × 110 cm"}];
+$("#fmtLst").innerHTML=FMT.map(function(f,k){return '<button data-rt-i="'+k+'"><b>'+f.t+'</b><span class="p">'+BRL(f.m*499)+'</span><span class="bar"><i style="--w:'+(f.m*25)+'%"></i></span></button>'}).join("");
+var fsel=-1;
+function showFmt(k,carregar){
+  var f=FMT[k];fsel=k;
+  $$("#fmtLst button").forEach(function(b,j){b.classList.toggle("on",j===k)});
+  $("#fmtTxt").innerHTML='<div class="swap"><div class="t">'+f.t+'</div><p style="margin-top:8px">'+f.d+'</p><div style="margin-top:14px">'+
+    [["Módulos",f.m],["Assinatura",BRL(f.m*499)+" por mês"],["Medidas",f.med],["Melhor uso",f.uso]].map(function(r){return '<div class="row"><span>'+r[0]+'</span><b>'+r[1]+'</b></div>'}).join("")+'</div></div>';
+  $("#fmtQr").innerHTML=qrSvg(AR_UNIV+"?modelo="+f.id);
+  if(carregar!==false){var mv=$("#fmtMv");mv.setAttribute("poster","assets/p/"+f.id+".webp");mv.setAttribute("ios-src",AR_UNIV+f.id+".usdz");mv.setAttribute("src",AR_UNIV+f.id+".glb")}
+}
+ROT.formato={ms:7500,texto:function(k){return FMT[k].d},mostrar:function(k){showFmt(k)}};
+$$("#fmtLst button").forEach(function(b,k){b.addEventListener("click",function(){showFmt(k)})});
+$("#fmtPdf").innerHTML='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:14px;align-items:end">'+FMT.map(function(f){
+  return '<div style="text-align:center"><img src="assets/p/'+f.id+'.webp" alt="" style="height:300px;width:auto;margin:0 auto"><b style="display:block;font-family:\'Exo 2\';font-size:17px;margin-top:10px">'+f.t+'</b><span style="display:block;font-size:13px;color:#56607A">'+f.m+' módulo'+(f.m>1?"s":"")+' · '+f.med+'</span><b style="display:block;font-family:\'Exo 2\';font-size:20px;color:var(--blue);margin-top:4px">'+BRL(f.m*499)+'/mês</b></div>'}).join("")+'</div>';
+
+/* ─────── 12 · sensores e camadas ─────── */
+var HS=[
+ {t:"Tela e conteúdo",p:"Plano Media",d:"Conteúdo trocado por loja, dia e horário, sem visita técnica, com registro de cada veiculação.",dec:"Mensagem certa na hora certa"},
+ {t:"QR do shopper",p:"Plano Essencial",d:"Leva o shopper para cupom, pesquisa ou página da marca e conta cada leitura, loja por loja.",dec:"Interesse real pela oferta"},
+ {t:"Sensor de presença",p:"Plano Sense",d:"Mede passagens na zona do display e o tempo aproximado de permanência, hora a hora.",dec:"Quais lojas e horários rendem mais"},
+ {t:"Saúde e alertas",p:"Plano Sense",d:"O display avisa quando fica sem energia ou sem sinal e quando precisa de visita.",dec:"Reparo antes de o shopper ver o problema"}];
+$("#hsTabs").innerHTML=HS.map(function(h,k){return '<button data-rt-i="'+k+'">'+(k+1)+'. '+h.t+'</button>'}).join("");
+function showHs(k){
+  $$("#hsTabs button").forEach(function(b,j){b.classList.toggle("on",j===k)});
+  $$(".s12 .hs").forEach(function(b){b.classList.toggle("on",+b.dataset.hs===k)});
+  var h=HS[k];$("#hsDet").innerHTML='<div class="swap" style="display:flex;flex-direction:column;gap:14px"><span class="plan">'+h.p+'</span><h3>'+h.t+'</h3><p>'+h.d+'</p><div class="dec"><svg class="ico" style="stroke:var(--blue);flex:0 0 24px"><use href="#i-eye"/></svg><span><b>Decide:</b> '+h.dec+'</span></div></div>';
+}
+ROT.sensor={texto:function(k){return HS[k].d},mostrar:showHs};
+$$("#hsTabs button").forEach(function(b,k){b.addEventListener("click",function(){showHs(k)})});
+$$(".s12 .hs").forEach(function(b){b.addEventListener("click",function(){showHs(+b.dataset.hs)})});
+showHs(0);
+$("#hsPdf").innerHTML=HS.map(function(h,k){return '<div style="padding:10px 0;border-bottom:1px solid var(--ln)"><b style="font-family:\'Exo 2\';font-size:18px">'+(k+1)+'. '+h.t+'</b> <span style="font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.1em;text-transform:uppercase">'+h.p+'</span><p style="font-size:14.5px;color:#56607A;margin-top:3px">'+h.d+' Decide: '+h.dec.toLowerCase()+'.</p></div>'}).join("");
+
+/* ─────── 13 · barras de comparação ─────── */
+ENTER[12]=function(sec){$$("#cmp .tr i",sec).forEach(function(b){b.style.width="0"});setTimeout(function(){$$("#cmp .tr i",sec).forEach(function(b){b.style.width=b.dataset.w+"%"})},PDF?0:450)};
+
+/* ─────── 14 · simulador ─────── */
+var SIM={L:100,F:1,M:12,R:.34};
+function seg(id,key){$$("#"+id+" button").forEach(function(b){b.addEventListener("click",function(){$$("#"+id+" button").forEach(function(x){x.classList.toggle("on",x===b)});SIM[key]=+b.dataset.v;sim()})})}
+seg("iF","F");seg("iM","M");seg("iR","R");
+$("#iL").addEventListener("input",function(){SIM.L=+this.value;sim()});
+function sim(){
+  var mod=SIM.L*SIM.F,mes=mod*499,tot=mes*SIM.M,imp=tot*SIM.R,ef=tot-imp,comprar=mod*(3200+350+70);
+  $("#vL").textContent=SIM.L.toLocaleString("pt-BR");
+  $("#oMes").textContent=BRL(mes);
+  $("#oDesc").textContent=SIM.L.toLocaleString("pt-BR")+" displays · "+mod.toLocaleString("pt-BR")+" módulos · R$ 499 por módulo";
+  $("#oTot").textContent=BRL(tot);$("#oImp").textContent=BRL(imp);$("#oEf").textContent=BRL(ef);
+  $("#oC").textContent=BRL(comprar);$("#oA").textContent=BRL(mes);
+  $("#bC").style.width="100%";$("#bA").style.width=(mes/comprar*100)+"%";
+}
+sim();
+
+/* ─────── Boot ─────── */
+ENTER[9]=function(){if(fsel<0)showFmt(0)};
+if(PDF){
+  slides=$$(".slide");$$(".slide").forEach(function(s){s.classList.add("on");countUp(s)});
+  ENTER[2]();ENTER[3]();showFmt(0,false);$$("#cmp .tr i").forEach(function(b){b.style.width=b.dataset.w+"%"});
+  $("#pdfQr").innerHTML=qrSvg("https://projetos.75lab.com.br/codice-industria/");
+}else{
+  var h0=parseInt((location.hash||"").slice(1),10);
+  slides[0].classList.add("on");setChrome();onEnter(slides[0]);
+  if(h0>1&&h0<=N)go(h0-1,true);
+  addEventListener("codice:liberado",function(){var s=slides[i];s.classList.remove("on");void s.offsetWidth;s.classList.add("on");onEnter(s)});
+}
+})();
+</script>
+<script>
+/* ─────── Cadastro de entrada ───────
+   Nome, e-mail, telefone, quem enviou o link e aceite dos termos. Vai para a função
+   leadApresentacao da Códice (planilha no Drive + aviso no celular). Se o servidor
+   não responder, a pessoa entra mesmo assim e o envio fica guardado para a próxima visita.
+   ?de=Nome no link já preenche "Quem te enviou o link?". */
+(function(){
+"use strict";
+if(document.documentElement.classList.contains("pdf"))return;
+var URL_LEAD="https://southamerica-east1-rental-display.cloudfunctions.net/leadApresentacao";
+var CHAVE="codice_acesso_v1",PENDENTE="codice_acesso_pendente",VERSAO="2026-10-30";
+var ler=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
+var gravar=function(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
+function enviar(dados,ms){
+  var ctl=window.AbortController?new AbortController():null,t=ctl&&setTimeout(function(){ctl.abort()},ms||10000);
+  return fetch(URL_LEAD,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(dados),signal:ctl&&ctl.signal})
+    .then(function(r){return r.json().catch(function(){return{}}).then(function(j){j.status=r.status;return j})})
+    .finally(function(){t&&clearTimeout(t)});
+}
+var pend=ler(PENDENTE);
+if(pend){try{enviar(JSON.parse(pend)).then(function(j){if(j.ok||j.status===400)gravar(PENDENTE,null)}).catch(function(){})}catch(e){gravar(PENDENTE,null)}}
+
+var html=document.documentElement;
+if(!html.classList.contains("gated"))return;
+var $=function(s){return document.getElementById(s)};
+var gate=$("gate"),card=$("gtCard"),form=$("gtForm"),btn=$("gtBtn"),msg=$("gtMsg"),aceite=$("gtAceite");
+var de=new URLSearchParams(location.search).get("de");
+if(de)$("gtQuem").value=de.slice(0,120);
+if(!matchMedia("(hover:none)").matches)setTimeout(function(){$("gtNome").focus()},450);
+$("gtTel").addEventListener("input",function(){
+  var d=this.value.replace(/\D/g,"");
+  if(d.length>11&&d.indexOf("55")===0)d=d.slice(2);
+  d=d.slice(0,11);
+  this.value=d.length>10?"("+d.slice(0,2)+") "+d.slice(2,7)+"-"+d.slice(7):d.length>6?"("+d.slice(0,2)+") "+d.slice(2,6)+"-"+d.slice(6):d.length>2?"("+d.slice(0,2)+") "+d.slice(2):d.length?"("+d:""});
+function campo(c){return form.querySelector('[data-c="'+c+'"]')}
+function marcar(c,ruim){campo(c).classList.toggle("err",ruim)}
+form.addEventListener("input",function(e){var c=e.target.closest("[data-c]");if(c)c.classList.remove("err");msg.classList.remove("on")});
+aceite.addEventListener("change",function(){campo("aceite").classList.remove("err")});
+$("gtVerTermos").addEventListener("click",function(e){e.preventDefault();card.classList.add("termos")});
+$("gtVoltar").addEventListener("click",function(){card.classList.remove("termos")});
+$("gtConcordo").addEventListener("click",function(){aceite.checked=true;campo("aceite").classList.remove("err");card.classList.remove("termos")});
+function liberar(nome){
+  gravar(CHAVE,JSON.stringify({nome:nome,em:new Date().toISOString(),termos:VERSAO}));
+  gate.classList.add("saindo");
+  setTimeout(function(){html.classList.remove("gated");gate.remove();dispatchEvent(new Event("codice:liberado"))},480);
+}
+form.addEventListener("submit",function(e){
+  e.preventDefault();
+  var d={nome:$("gtNome").value.trim(),email:$("gtEmail").value.trim(),telefone:$("gtTel").value.trim(),quem:$("gtQuem").value.trim(),
+    site:$("gtSite").value,aceite:aceite.checked,versaoTermos:VERSAO,pagina:location.href.split("#")[0],origem:document.referrer||""};
+  var ruins={nome:d.nome.length<2,email:!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(d.email),telefone:d.telefone.replace(/\D/g,"").length<10,quem:d.quem.length<2,aceite:!d.aceite};
+  var algum=false;
+  for(var c in ruins){marcar(c,ruins[c]);if(ruins[c]&&!algum){algum=true;var inp=campo(c).querySelector("input");inp&&inp.focus()}}
+  if(algum)return;
+  btn.disabled=true;btn.querySelector("span").textContent="Abrindo...";
+  enviar(d).then(function(j){
+    if(j.ok){gravar(PENDENTE,null);liberar(d.nome);return}
+    if(j.status===400&&j.campos){j.campos.forEach(function(c){if(campo(c))marcar(c,true)})}
+    else if(j.status===429){msg.textContent="Muitas tentativas seguidas. Espere um minuto e tente de novo.";msg.classList.add("on")}
+    else{gravar(PENDENTE,JSON.stringify(d));liberar(d.nome);return}
+    btn.disabled=false;btn.querySelector("span").textContent="Abrir a apresentação";
+  }).catch(function(){gravar(PENDENTE,JSON.stringify(d));liberar(d.nome)});
+});
+})();
+</script>
+<script>
+// a página não fica presa no cache do GitHub Pages: se versao.txt mudou, recarrega com ?v=
+(function(){if(/[?&]pdf=1/.test(location.search))return;var atual=document.getElementById("versaoDeck").content;
+  fetch("versao.txt?t="+Date.now(),{cache:"no-store"}).then(function(r){return r.ok?r.text():null}).then(function(v){v=(v||"").trim();
+    if(v&&v!==atual&&!/[?&]v=/.test(location.search)){var u=new URL(location.href);u.searchParams.set("v",v);location.replace(u.toString())}}).catch(function(){})})();
+</script>
+</body>
+</html>
