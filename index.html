@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta id="versaoDeck" content="2">
+<meta id="versaoDeck" content="3">
 <title>Códice · Display como serviço para a indústria</title>
 <meta name="description" content="Display inteligente no ponto extra, fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A marca assina por módulo, por mês.">
 <meta property="og:title" content="Códice · Display como serviço para a indústria">
@@ -218,19 +218,17 @@ h2 em,h1 em{font-style:normal;color:var(--em)}
 .s4 .note .ico{flex:0 0 30px;width:30px;height:30px;stroke:var(--teal)}
 
 /* ==================== 05 · ICEBERG ==================== */
-.s5{background:linear-gradient(180deg,#F5F7FA 0%,#F5F7FA 37%,#0B2763 37.2%,#061B49 70%,#030E28 100%)}
-.s5 .wave{position:absolute;left:0;right:0;top:calc(37% - 18px);height:36px;width:200%;animation:wave 14s linear infinite}
-@keyframes wave{to{transform:translateX(-50%)}}
+.s5{background:#061B49 url(assets/iceberg.jpg) center/cover no-repeat}
+.s5 .shade{position:absolute;left:0;right:0;top:40%;bottom:0;background:linear-gradient(90deg,rgba(3,14,40,0) 45%,rgba(3,14,40,.35) 100%),linear-gradient(180deg,rgba(3,14,40,0) 55%,rgba(3,14,40,.45) 100%);pointer-events:none}
 .s5 .hd{color:var(--navy);--em:var(--blue);--fg2:#56607A}
-.s5 .berg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.s5 .tip{position:absolute;left:470px;top:152px;color:var(--navy)}
+.s5 .tip{position:absolute;left:446px;top:160px;color:var(--navy)}
 .s5 h2{font-size:50px}
 .s5 .tip small{display:block;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#56607A}
 .s5 .tip b{font-family:'Exo 2';font-size:40px;font-weight:800}
 .s5 .hid{position:absolute;left:40px;top:43%;width:540px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.s5 .hid button{padding:16px 18px 18px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);color:#fff;transition:background .3s,border-color .3s,transform .3s}
+.s5 .hid button{padding:16px 18px 18px;border-radius:14px;background:rgba(6,27,73,.62);border:1px solid rgba(255,255,255,.24);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;transition:background .3s,border-color .3s,transform .3s}
 .s5 .hid button b{display:block;font-family:'Exo 2';font-size:19px;font-weight:700}
-.s5 .hid button small{display:block;margin-top:3px;font-size:13.5px;color:rgba(255,255,255,.62)}
+.s5 .hid button small{display:block;margin-top:3px;font-size:13.5px;color:rgba(255,255,255,.72)}
 .s5 .hid button.on{background:#fff;color:var(--navy);border-color:#fff;transform:translateX(6px)}
 .s5 .hid button.on small{color:#56607A}
 .s5 .det{position:absolute;right:0;top:43%;width:560px;color:#fff}
@@ -239,7 +237,7 @@ h2 em,h1 em{font-style:normal;color:var(--em)}
 .s5 .det .v{font-family:'Exo 2';font-size:30px;font-weight:700;color:var(--teal);margin-top:10px}
 .s5 .det p{font-size:19px;line-height:1.5;color:rgba(255,255,255,.78);margin-top:14px;max-width:500px}
 .s5 .det .swap{animation:aFade .45s both}
-.s5 .src{color:rgba(255,255,255,.5)}
+.s5 .src{color:rgba(255,255,255,.62)}
 .s5 .clk{color:rgba(255,255,255,.7)}.s5 .clk svg{stroke:var(--teal)}
 
 /* ==================== 06 · GRUPO ==================== */
@@ -710,11 +708,7 @@ html.pdf .pfoot{display:flex}
   <!-- ═══ 05 · O CUSTO ESCONDIDO ═══ -->
   <section class="slide s5" data-tone="lt" data-bot="dk" data-t="O custo escondido do display próprio">
     <div class="pfoot"><img src="assets/codice-logotipo.png" alt="">O problema</div>
-    <svg class="berg" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true">
-      <polygon points="318,333 352,292 398,268 452,286 486,318 496,333" fill="#fff" stroke="rgba(6,27,73,.2)" stroke-width="2"/>
-      <polygon points="300,350 510,350 700,420 744,610 660,790 420,858 180,780 112,580 168,430" fill="rgba(255,255,255,.045)" stroke="rgba(255,255,255,.16)" stroke-width="2" stroke-dasharray="6 8"/>
-    </svg>
-    <svg class="wave" viewBox="0 0 3200 36" preserveAspectRatio="none" aria-hidden="true"><path d="M0 18 Q100 4 200 18 T400 18 T600 18 T800 18 T1000 18 T1200 18 T1400 18 T1600 18 T1800 18 T2000 18 T2200 18 T2400 18 T2600 18 T2800 18 T3000 18 T3200 18 V36 H0z" fill="#0B2763"/></svg>
+    <div class="shade"></div>
     <div class="m">
       <div class="hd">
         <div class="ey" data-a style="--d:0">O display próprio</div>
