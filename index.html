@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta id="versaoDeck" content="1">
+<meta id="versaoDeck" content="2">
 <title>Códice · Display como serviço para a indústria</title>
 <meta name="description" content="Display inteligente no ponto extra, fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A marca assina por módulo, por mês.">
 <meta property="og:title" content="Códice · Display como serviço para a indústria">
@@ -199,7 +199,7 @@ h2 em,h1 em{font-style:normal;color:var(--em)}
 /* ==================== 04 · 29% ==================== */
 .s4 .wrap{display:grid;grid-template-columns:400px 1fr;gap:90px;margin-top:30px;flex:1;min-height:0}
 .s4 .waf{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;align-content:start}
-.s4 .waf i{aspect-ratio:.8;border-radius:5px 5px 3px 3px;background:var(--navy);position:relative;transition:background .4s,box-shadow .4s}
+.s4 .waf i{aspect-ratio:.92;border-radius:5px 5px 3px 3px;background:var(--navy);position:relative;transition:background .4s,box-shadow .4s}
 .s4 .waf i::after{content:"";position:absolute;left:18%;right:18%;top:22%;height:2px;background:rgba(255,255,255,.4);box-shadow:0 8px 0 rgba(255,255,255,.4),0 16px 0 rgba(255,255,255,.4)}
 .s4 .waf i.x{background:transparent;box-shadow:inset 0 0 0 2px #E0533D}
 .s4 .waf i.x::after{background:rgba(224,83,61,.5);box-shadow:none;top:48%;transform:rotate(-40deg);left:8%;right:8%}
@@ -223,7 +223,8 @@ h2 em,h1 em{font-style:normal;color:var(--em)}
 @keyframes wave{to{transform:translateX(-50%)}}
 .s5 .hd{color:var(--navy);--em:var(--blue);--fg2:#56607A}
 .s5 .berg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.s5 .tip{position:absolute;left:428px;top:150px;color:var(--navy)}
+.s5 .tip{position:absolute;left:470px;top:152px;color:var(--navy)}
+.s5 h2{font-size:50px}
 .s5 .tip small{display:block;font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#56607A}
 .s5 .tip b{font-family:'Exo 2';font-size:40px;font-weight:800}
 .s5 .hid{position:absolute;left:40px;top:43%;width:540px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -243,7 +244,7 @@ h2 em,h1 em{font-style:normal;color:var(--em)}
 
 /* ==================== 06 · GRUPO ==================== */
 .s6{background:#030E28}
-.s6 .ph{position:absolute;right:0;top:0;bottom:0;width:42%;overflow:hidden}
+.s6 .ph{position:absolute;right:0;top:300px;bottom:0;width:42%;overflow:hidden}
 .s6 .ph img{width:100%;height:100%;object-fit:cover;object-position:40% 80%;opacity:.5}
 .s6 .ph::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#030E28 0%,rgba(3,14,40,0) 38%),linear-gradient(90deg,#030E28 0%,rgba(3,14,40,.45) 40%,rgba(3,14,40,.2) 100%)}
 .s6 .stack{margin-top:34px;display:flex;flex-direction:column-reverse;gap:10px;width:960px}
@@ -451,7 +452,7 @@ h2 em,h1 em{font-style:normal;color:var(--em)}
 
 /* ==================== 15 · PRÓXIMO PASSO ==================== */
 .s15{background:radial-gradient(70% 80% at 20% 30%,#0D2E72 0%,#061B49 50%,#030E28 100%)}
-.s15 h2{font-size:72px;max-width:1100px}
+.s15 h2{font-size:72px;text-wrap:wrap}
 .s15 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px}
 .s15 .steps div{padding:24px 26px;border-radius:20px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
 .s15 .steps b{font-family:'Exo 2';font-size:14px;font-weight:800;letter-spacing:.16em;color:var(--teal)}
@@ -556,7 +557,7 @@ html.pdf #deck{position:static;overflow:visible}
 html.pdf #stage{position:static;margin:0;transform:none!important;height:auto;overflow:visible;background:none}
 html.pdf .slide{display:block;position:relative;width:1600px;height:900px;page-break-after:always;break-after:page}
 html.pdf .slide [data-a],html.pdf .slide *{animation:none!important}
-html.pdf #top,html.pdf #bot,html.pdf #cv,html.pdf #menu,html.pdf #cur,html.pdf #curDot,html.pdf #gate,html.pdf #rotate,html.pdf #lb,html.pdf .no-pdf,html.pdf .clk{display:none!important}
+html.pdf #top,html.pdf #bot,html.pdf #cv,html.pdf #menu,html.pdf #cur,html.pdf #curDot,html.pdf #gate,html.pdf #rotate,html.pdf #lb,html.pdf .no-pdf,html.pdf .clk,html.pdf .zoom{display:none!important}
 html.pdf .pdf-only{display:revert}
 html.pdf .pfoot{display:flex}
 .pfoot{display:none;position:absolute;left:6%;right:6%;top:34px;align-items:center;gap:12px;font-family:'Exo 2';font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.55)}
@@ -627,7 +628,7 @@ html.pdf .pfoot{display:flex}
       <div class="ey" data-a style="--d:0">Códice para a indústria</div>
       <h1 data-a style="--d:1">Sua marca no ponto extra. <em>Sem comprar o móvel.</em></h1>
       <p class="lede" data-a style="--d:2">Display inteligente fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A sua marca assina por módulo, por mês.</p>
-      <div class="acts" data-a style="--d:3">
+      <div class="acts no-pdf" data-a style="--d:3">
         <button class="btn pri" data-go="1">Começar<svg><use href="#i-arr"/></svg></button>
         <button class="btn gho" data-go="13">Simular o meu programa</button>
         <a class="btn gho" href="codice-industria.pdf" download><svg><use href="#i-pdf"/></svg>PDF</a>
@@ -730,7 +731,7 @@ html.pdf .pfoot{display:flex}
       </div>
       <div class="det no-pdf" data-a="right" style="--d:4"><div id="custoDet"></div>
         <div class="clk" style="margin-top:26px"><svg><use href="#i-hand"/></svg>Clique em cada custo escondido</div></div>
-      <div class="det pdf-only" id="custoPdf" style="top:40%"></div>
+      <div class="det pdf-only" id="custoPdf" style="top:37%"></div>
       <p class="src">Fonte: valores de referência do plano de negócio da Códice; Agarwal, Stamatopoulos e Zeng, M&amp;SOM, 2024; Receita Federal, IN RFB 1.700/2017, anexo III (móveis: vida útil de 10 anos).</p>
     </div>
   </section>
@@ -900,7 +901,7 @@ html.pdf .pfoot{display:flex}
           <button class="hs" data-hs="3" style="left:44%;top:90%">4</button>
         </div>
         <div class="pan">
-          <div class="tabs" id="hsTabs" data-rt="sensor" data-a style="--d:3"></div>
+          <div class="tabs no-pdf" id="hsTabs" data-rt="sensor" data-a style="--d:3"></div>
           <div id="hsDet" class="no-pdf"></div>
           <div id="hsPdf" class="pdf-only"></div>
           <div class="clk no-pdf"><svg><use href="#i-hand"/></svg>Clique nos números do display ou nas abas</div>
@@ -986,7 +987,7 @@ html.pdf .pfoot{display:flex}
     <div class="pfoot"><img src="assets/codice-logotipo-branco.png" alt="">Próximo passo</div>
     <div class="m">
       <div class="ey" data-a style="--d:0">Próximo passo</div>
-      <h2 data-a style="--d:1">76% decidem na loja. <em>A sua marca vai estar lá?</em></h2>
+      <h2 data-a style="--d:1">76% decidem na loja.<br><em>A sua marca vai estar lá?</em></h2>
       <div class="steps">
         <div data-a style="--d:2"><b>01</b><h3>Conversa de 30 minutos</h3><p>Formatos, lojas prioritárias e calendário de campanhas.</p></div>
         <div data-a style="--d:3"><b>02</b><h3>Proposta por loja</h3><p>Preço, prazo e plano de instalação de cada ponto.</p></div>
@@ -1226,7 +1227,7 @@ ROT.custo={texto:function(k){return CUSTO[k].d},mostrar:function(k){
   var c=CUSTO[k];$("#custoDet").innerHTML='<div class="swap"><div class="k">Custo escondido '+String(k+1).padStart(2,"0")+' de 06</div><h3>'+c.t+'</h3><div class="v">'+c.v+'</div><p>'+c.d+'</p></div>'}};
 $$(".s5 .hid button").forEach(function(b,k){b.addEventListener("click",function(){ROT.custo.mostrar(k)})});
 ROT.custo.mostrar(0);
-$("#custoPdf").innerHTML=CUSTO.map(function(c){return '<div style="margin-bottom:12px"><b style="font-family:\'Exo 2\';font-size:20px">'+c.t+' · <span style="color:var(--teal)">'+c.v+'</span></b><p style="font-size:14.5px;margin-top:2px">'+c.d+'</p></div>'}).join("");
+$("#custoPdf").innerHTML=CUSTO.map(function(c){return '<div style="margin-bottom:9px"><b style="font-family:\'Exo 2\';font-size:17px">'+c.t+' · <span style="color:var(--teal)">'+c.v+'</span></b><p style="font-size:13px;line-height:1.4;margin-top:1px;color:rgba(255,255,255,.75)">'+c.d+'</p></div>'}).join("");
 
 /* ─────── 07 · código de barras da etiqueta ─────── */
 $("#barcode").innerHTML=[3,1,2,1,3,2,1,1,3,1,2,3,1,2,1,3,1,1,2,3,1,2,1,1,3,2,1,3,1,2,1,2,3,1].map(function(w,k){return '<i style="flex:'+w+';opacity:'+(k%2?0:1)+'"></i>'}).join("");
@@ -1267,7 +1268,7 @@ function showFmt(k,carregar){
 ROT.formato={ms:7500,texto:function(k){return FMT[k].d},mostrar:function(k){showFmt(k)}};
 $$("#fmtLst button").forEach(function(b,k){b.addEventListener("click",function(){showFmt(k)})});
 $("#fmtPdf").innerHTML='<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:14px;align-items:end">'+FMT.map(function(f){
-  return '<div style="text-align:center"><img src="assets/p/'+f.id+'.webp" alt="" style="height:300px;width:auto;margin:0 auto"><b style="display:block;font-family:\'Exo 2\';font-size:17px;margin-top:10px">'+f.t+'</b><span style="display:block;font-size:13px;color:#56607A">'+f.m+' módulo'+(f.m>1?"s":"")+' · '+f.med+'</span><b style="display:block;font-family:\'Exo 2\';font-size:20px;color:var(--blue);margin-top:4px">'+BRL(f.m*499)+'/mês</b></div>'}).join("")+'</div>';
+  return '<div style="text-align:center"><img src="assets/p/'+f.id+'.webp" alt="" style="width:100%;height:290px;object-fit:contain;object-position:bottom"><b style="display:block;font-family:\'Exo 2\';font-size:17px;margin-top:10px">'+f.t+'</b><span style="display:block;font-size:13px;color:#56607A">'+f.m+' módulo'+(f.m>1?"s":"")+' · '+f.med+'</span><b style="display:block;font-family:\'Exo 2\';font-size:20px;color:var(--blue);margin-top:4px">'+BRL(f.m*499)+'/mês</b></div>'}).join("")+'</div>';
 
 /* ─────── 12 · sensores e camadas ─────── */
 var HS=[
