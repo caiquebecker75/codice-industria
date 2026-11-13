@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta id="versaoDeck" content="5">
+<meta id="versaoDeck" content="6">
 <title>Códice · Display como serviço para a indústria</title>
 <meta name="description" content="Display inteligente no ponto extra, fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A marca assina por módulo, por mês.">
 <meta property="og:title" content="Códice · Display como serviço para a indústria">
@@ -1325,7 +1325,7 @@ if(PDF){
   var h0=parseInt((location.hash||"").slice(1),10);
   slides[0].classList.add("on");setChrome();onEnter(slides[0]);
   if(h0>1&&h0<=N)go(h0-1,true);
-  addEventListener("codice:liberado",function(){var s=slides[i];s.classList.remove("on");void s.offsetWidth;s.classList.add("on");onEnter(s)});
+  addEventListener("codice:liberado",function(){if(h0>1&&h0<=N&&i===0){go(h0-1,true);return}var s=slides[i];s.classList.remove("on");void s.offsetWidth;s.classList.add("on");onEnter(s)});
 }
 })();
 </script>
