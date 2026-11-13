@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta id="versaoDeck" content="4">
+<meta id="versaoDeck" content="5">
 <title>Códice · Display como serviço para a indústria</title>
 <meta name="description" content="Display inteligente no ponto extra, fabricado pela NEOBAND, instalado, mantido e medido pela Códice. A marca assina por módulo, por mês.">
 <meta property="og:title" content="Códice · Display como serviço para a indústria">
@@ -19,7 +19,7 @@
 // ?pdf=1: modo de impressão (todas as telas empilhadas, sem cadastro). Quem já se identificou não vê o cadastro de novo.
 (function(){var h=document.documentElement,pdf=/[?&]pdf=1/.test(location.search);
   if(pdf){h.classList.add("pdf");return}
-  var ok=false;try{ok=!!localStorage.getItem("codice_acesso_v1")}catch(e){}
+  var ok=false;try{ok=!!localStorage.getItem("codice_industria_acesso_v1")}catch(e){}
   if(!ok)h.classList.add("gated")})();
 </script>
 <style>
@@ -1339,7 +1339,7 @@ if(PDF){
 "use strict";
 if(document.documentElement.classList.contains("pdf"))return;
 var URL_LEAD="https://southamerica-east1-rental-display.cloudfunctions.net/leadApresentacao";
-var CHAVE="codice_acesso_v1",PENDENTE="codice_acesso_pendente",VERSAO="2026-10-30";
+var CHAVE="codice_industria_acesso_v1",PENDENTE="codice_industria_pendente",VERSAO="2026-10-30";
 var ler=function(k){try{return localStorage.getItem(k)}catch(e){return null}};
 var gravar=function(k,v){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch(e){}};
 function enviar(dados,ms){

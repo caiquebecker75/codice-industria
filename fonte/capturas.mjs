@@ -4,7 +4,7 @@ import { chromium } from "/Users/caiquebecker/ariuno-site/node_modules/playwrigh
 const [base, out, modo] = process.argv.slice(2);
 const b = await chromium.launch();
 const p = await b.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 1 });
-await p.addInitScript(() => { try { localStorage.setItem("codice_acesso_v1", "{}"); } catch (e) {} });
+await p.addInitScript(() => { try { localStorage.setItem("codice_industria_acesso_v1", "{}"); } catch (e) {} });
 if (modo === "pdf") {
   await p.goto(base + "?pdf=1", { waitUntil: "networkidle" });
   await p.waitForTimeout(1500);
